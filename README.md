@@ -30,7 +30,7 @@ As a side-effect, *Adebar* generates a „report“ (or „short documentation�
 
 Optionally, if you have the PHP [CLI](https://en.wikipedia.org/wiki/Command-line_interface "Wikipedia: Command-line interface") available on your computer, you can parse the `packages.xml` with provided PHP scripts, located in the `tools/` directory. This directory also includes a shell script to convert ADB backup files into `.tar.gz` archives (`ab2tar`; requires `openssl`) – and another one if you have issues restoring ADB backups on Android 7 or higher (`abrestore`; if your device is affected by the ADB restore bug, only restoring backups of apps already installed on the device).
 
-> **As *Adebar* is not yet tested on too many devices, there might be some errors/bugs here and there; if you encounter one, please file an issue at [the project's Coderberg presence][1]. General feedback is also more than welcome if you're successfully using *Adebar* with your device, see [List of tested devices](https://codeberg.org/izzy/Adebar/issues/7).**
+> **As *Adebar* is not yet tested on too many devices, there might be some errors/bugs here and there; if you encounter one, please file an issue at [the project's Codeberg presence][1]. General feedback is also more than welcome if you're successfully using *Adebar* with your device, see [List of tested devices](https://codeberg.org/izzy/Adebar/issues/7).**
 
 
 ## Requirements
