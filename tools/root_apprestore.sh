@@ -10,7 +10,7 @@
 # --=[ Syntax ]=--
 [[ -z "$1" ]] && {
   echo -e "\n\033[1;37mroot_backup\033[0m"
-  echo "Obtaining APK and data of a given app using root powers"
+  echo "Restoring APK and data of a given app using root powers"
   echo
   echo "Syntax:"
   echo -e "  $0 <packageName> [sourceDirectory]\n"
