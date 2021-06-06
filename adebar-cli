@@ -113,11 +113,13 @@ _OOPS_REPEAT=0       # whether to show the same "oops'd line" multiple times
 declare -A OOPSES    # array to store which lines where already reported
 
 ############################################[ Init ]###
-BINDIR="$(dirname "$(readlink -mn "${0}")")" #"
+BINDIR="$(dirname "$(readlink -mn "${0}")")"
+LIBDIR="${BINDIR}/lib"
+USER_CONF="${BINDIR}/config"
 
 # check parameters
 if [[ "$1" = "-a" || "$1" = "--auto" ]]; then
-  if [[ ! -d "${BINDIR}/config" ]]; then
+  if [[ ! -d "${USER_CONF}" ]]; then
     echo
     echo "Sorry, but you can't use automatic config detection with no config directory"
     echo "created. Please create it first, and have your config files placed there."
@@ -126,7 +128,7 @@ if [[ "$1" = "-a" || "$1" = "--auto" ]]; then
   fi
   declare -i trc=0
   for serial in $(adb devices|tail -n +2|awk '{print $1}'); do
-    confi=$(grep -E "^\s*SERIAL=.${serial}.\s*$" "${BINDIR}/config/"*  |head -n 1|awk -F ':' '{print $1}')
+    confi=$(grep -E "^\s*SERIAL=.${serial}.\s*$" "${USER_CONF}/"*  |head -n 1|awk -F ':' '{print $1}')
     [[ -z "${confi}" ]] && continue # unknown device, i.e. serial not found in any config
     confi=${confi##*/}
     $0 $confi
@@ -138,15 +140,15 @@ elif [[ -z "$1" || "$1" = "-h" || "$1" = "--help" ]]; then
   echo "Syntax: $0 <config|target_directory> [suffix]"
   echo "Syntax: $0 <-a|--auto|-h|--help>"
   echo
-  if [[ ! -d "${BINDIR}/config" || "$1" = "-h" || "$1" = "--help" ]]; then
+  if [[ ! -d "${USER_CONF}" || "$1" = "-h" || "$1" = "--help" ]]; then
     echo "There are no more command-line parameters currently, everything is"
     echo "controlled via config files. For details, please see the project's"
     echo "wiki at ${WIKI_BASE}/Configuration"
     echo
   fi
-  if [[ -d "${BINDIR}/config" ]]; then
+  if [[ -d "${USER_CONF}" ]]; then
     echo "Available config files:"
-    for con in "${BINDIR}"/config/*; do
+    for con in "${USER_CONF}"/*; do
       [[ -f "${con}" ]] && echo "- $(basename ${con})"
     done
   fi
@@ -157,14 +159,14 @@ else
 fi
 
 # Checking for config file and sourcing it, if exists
-if [ -d "${BINDIR}/config" ]; then
-  if [ -f "${BINDIR}/config/$OUTDIR" ]; then # device-specific config
-    . "${BINDIR}/config/$OUTDIR"
-  elif [ -f "${BINDIR}/config/default" ]; then # default config
-    . "${BINDIR}/config/default"
+if [ -d "${USER_CONF}" ]; then
+  if [ -f "${USER_CONF}/$OUTDIR" ]; then # device-specific config
+    . "${USER_CONF}/$OUTDIR"
+  elif [ -f "${USER_CONF}/default" ]; then # default config
+    . "${USER_CONF}/default"
   fi
-elif [ -f "${BINDIR}/config" ]; then # default config as of v3
-  . "${BINDIR}/config"
+elif [ -f "${USER_CONF}" ]; then # default config as of v3
+  . "${USER_CONF}"
 fi
 
 # check whether output directory shall have a suffix
@@ -282,15 +284,15 @@ DEVICE_SDKVER=${DEVICE_SDKVER//[$'\t\r\n']}
 }
 
 # Load libraries if needed
-. "${BINDIR}/lib/common.lib"
-. "${BINDIR}/lib/dummydevs.lib"
-[[ $((${MK_PARTINFO} + ${MK_PARTBACKUP})) -gt 0 ]] && . "${BINDIR}/lib/partitions.lib"
-[[ $(($PULL_SETTINGS + $MK_XPRIVACY_EXPORT + $MK_XPRIVACY_PULL)) -gt 0 ]] && . "${BINDIR}/lib/pull_config.lib"
-[[ $MK_TIBU -eq 1 ]] && . "${BINDIR}/lib/tibu.lib"
-[[ $((${MK_APPDISABLE} + ${MK_APPENABLE} + ${MK_USERBACKUP} + ${MK_SYSBACKUP} + ${MK_INSTALLLOC})) -gt 0 ]] && . "${BINDIR}/lib/scriptgen.lib"
-[[ ${MK_DEVICEINFO} -gt 0 ]] && . "${BINDIR}/lib/deviceinfo.lib"
-[[ $((${MK_USERAPPS} + ${MK_SYSAPPS})) -ne 0 ]] && . "${BINDIR}/lib/packagedata.lib"
-[[ -n "${TRANSFER_DIR}" ]] && . "${BINDIR}/lib/transfer.lib"
+. "${LIBDIR}/common.lib"
+. "${LIBDIR}/dummydevs.lib"
+[[ $((${MK_PARTINFO} + ${MK_PARTBACKUP})) -gt 0 ]] && . "${LIBDIR}/partitions.lib"
+[[ $(($PULL_SETTINGS + $MK_XPRIVACY_EXPORT + $MK_XPRIVACY_PULL)) -gt 0 ]] && . "${LIBDIR}/pull_config.lib"
+[[ $MK_TIBU -eq 1 ]] && . "${LIBDIR}/tibu.lib"
+[[ $((${MK_APPDISABLE} + ${MK_APPENABLE} + ${MK_USERBACKUP} + ${MK_SYSBACKUP} + ${MK_INSTALLLOC})) -gt 0 ]] && . "${LIBDIR}/scriptgen.lib"
+[[ ${MK_DEVICEINFO} -gt 0 ]] && . "${LIBDIR}/deviceinfo.lib"
+[[ $((${MK_USERAPPS} + ${MK_SYSAPPS})) -ne 0 ]] && . "${LIBDIR}/packagedata.lib"
+[[ -n "${TRANSFER_DIR}" ]] && . "${LIBDIR}/transfer.lib"
 
 declare -a userApps # list of package names
 declare -a sysApps
