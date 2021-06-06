@@ -117,6 +117,12 @@ BINDIR="$(dirname "$(readlink -mn "${0}")")"
 LIBDIR="${BINDIR}/lib"
 USER_CONF="${BINDIR}/config"
 
+# if directory exist use config in HOME
+if [[ -d "$HOME/.config/adebar" ]]; then
+  USER_CONF="$HOME/.config/adebar/cli"
+  [[ ! -d "$USER_CONF" ]] && mkdir "$USER_CONF"
+fi
+
 # check parameters
 if [[ "$1" = "-a" || "$1" = "--auto" ]]; then
   if [[ ! -d "${USER_CONF}" ]]; then
