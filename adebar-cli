@@ -114,12 +114,11 @@ declare -A OOPSES    # array to store which lines where already reported
 ############################################[ Init ]###
 BINDIR="$(dirname "$(readlink -mn "${0}")")"
 LIBDIR="${BINDIR}/lib"
-USER_CONF="${BINDIR}/config"
 
-# if directory exist use config in HOME
-if [[ -d "$HOME/.config/adebar" ]]; then
-  USER_CONF="$HOME/.config/adebar/cli"
-  [[ ! -d "$USER_CONF" ]] && mkdir "$USER_CONF"
+# get user config if exist
+USER_CONF="$HOME/.config/adebar"
+if [[ ! -d "$HOME/.config/adebar" ]]; then
+  USER_CONF="${BINDIR}/config"
 fi
 
 # check parameters
