@@ -1,5 +1,5 @@
 ##############################################################################
-# Adebar © 2014-2021 by Itzchak Rehberg
+# Adebar © 2014-2022 by Itzchak Rehberg
 # This is part of the Adebar project, see https://codeberg.org/izzy/Adebar
 # Protected by the GPLv2
 # ----------------------------------------------------------------------------
@@ -26,15 +26,32 @@ getSettings() {
   [[ -z "$msg" ]] && msg="OK"
   doProgress "- build.prop: $(trim "${msg##*]}")" 2
 
-  # wpa_supplicant.conf
+  # wpa_supplicant.conf (pre-Oreo) / WifiConfigStore.xml (Oreo+)
   local wificonf="/data/misc/wifi/wpa_supplicant.conf"
+  local wifiap="/data/misc/wifi/softap.conf"
   if [[ ${ROOT_COMPAT} -eq 1 ]]; then
     adb ${ADBOPTS} shell "su -c 'ls /data/misc/wifi/wpa_supplicant.conf' >/dev/null 2>&1"
-    [[ $? -ne 0 ]] && wificonf="/data/misc/wifi/WifiConfigStore.xml"
+    [[ $? -ne 0 ]] && {
+      adb ${ADBOPTS} shell "su -c 'ls /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml' >/dev/null 2>&1"
+      if [[ $? -eq 0 ]]; then
+        wificonf="/data/misc/apexdata/com.android.wifi/WifiConfigStore.xml"
+        wifiap="/data/misc/apexdata/com.android.wifi/WifiConfigStoreSoftAp.xml"
+      else
+        wificonf="/data/misc/wifi/WifiConfigStore.xml"
+      fi
+    }
     msg="$((adb ${ADBOPTS} shell "su -c 'cat $wificonf'" > "${CONFDIR}/$(basename $wificonf)") 2>&1)"
   else
     adb ${ADBOPTS} shell "ls /data/misc/wifi/wpa_supplicant.conf >/dev/null 2>&1"
-    [[ $? -ne 0 ]] && wificonf="/data/misc/wifi/WifiConfigStore.xml"
+    [[ $? -ne 0 ]] && {
+      adb ${ADBOPTS} shell "ls /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml' >/dev/null 2>&1"
+      if [[ $? -eq 0 ]]; then
+        wificonf="/data/misc/apexdata/com.android.wifi/WifiConfigStore.xml"
+        wifiap="/data/misc/apexdata/com.android.wifi/WifiConfigStoreSoftAp.xml"
+      else
+        wificonf="/data/misc/wifi/WifiConfigStore.xml"
+      fi
+    }
     msg="$((adb ${ADBOPTS} pull $wificonf "${CONFDIR}/$(basename $wificonf)") 2>&1)"
   fi
   [[ $? -ne 0 ]] && msg=$(ansi_code "${msg}" "red")
@@ -43,13 +60,13 @@ getSettings() {
 
   # softap.conf
   if [[ ${ROOT_COMPAT} -eq 1 ]]; then
-    msg="$((adb ${ADBOPTS} shell "su -c 'cat /data/misc/wifi/softap.conf'" > "${CONFDIR}/softap.conf") 2>&1)"
+    msg="$((adb ${ADBOPTS} shell "su -c 'cat $wifiap'" > "${CONFDIR}/$(basename $wifiap)") 2>&1)"
   else
-    msg="$((adb ${ADBOPTS} pull /data/misc/wifi/softap.conf "${CONFDIR}/softap.conf") 2>&1)"
+    msg="$((adb ${ADBOPTS} pull $wifiap "${CONFDIR}/$(basename $wifiap)") 2>&1)"
   fi
   [[ $? -ne 0 ]] && msg=$(ansi_code "${msg}" "red")
   [[ -z "$msg" ]] && msg="OK"
-  doProgress "- softap.conf: $msg" 2
+  doProgress "- $(basename $wifiap): $msg" 2
 
   # gps.conf, hosts
   msg="$((adb ${ADBOPTS} pull /system/etc/gps.conf "${CONFDIR}/gps.conf") 2>&1)"
