@@ -44,7 +44,7 @@ getSettings() {
   else
     adb ${ADBOPTS} shell "ls /data/misc/wifi/wpa_supplicant.conf >/dev/null 2>&1"
     [[ $? -ne 0 ]] && {
-      adb ${ADBOPTS} shell "ls /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml' >/dev/null 2>&1"
+      adb ${ADBOPTS} shell "ls /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml >/dev/null 2>&1"
       if [[ $? -eq 0 ]]; then
         wificonf="/data/misc/apexdata/com.android.wifi/WifiConfigStore.xml"
         wifiap="/data/misc/apexdata/com.android.wifi/WifiConfigStoreSoftAp.xml"
