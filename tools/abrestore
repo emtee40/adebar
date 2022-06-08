@@ -18,6 +18,13 @@ pkgname="${1%%.ab}"
 if [[ "$(ldd "$(which openssl)" | grep '^[[:space:]]*libz\.')" ]]; then #"
     unzlib="openssl zlib -d"
 else
+    [[ -z "$(which zlib-flate)" ]] && {
+      echo "Cannot find openssl, or it is not configured with zlib support."
+      echo "zlib-flate cannot be found either, so we cannot uncompress the backup."
+      echo "On Linux, zlib-flate is part of the qpdf package."
+      echo
+      exit 5
+    }
     unzlib="zlib-flate -uncompress"
 fi
 
