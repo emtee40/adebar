@@ -673,8 +673,11 @@ function _mkAppLink() {
   local pkgname=$1
   local appname="$2"
   local link
+  local installer=${PK_INSTALLER[$pkgname]}
   if [[ "${appname}" = "${pkgname}" || -z "${appname}" ]]; then
     link=$pkgname
+  elif [[ -n "$installer" && -n "${APP_MARKET_URL[$installer]}" ]]; then
+    link="$(href "${APP_MARKET_URL[$installer]/\%s/${pkgname}}" "${appname}")"
   elif [[ -n "${APP_MARKET_URL[unknown]}" ]]; then
     link="$(href "${APP_MARKET_URL[unknown]/\%s/${pkgname}}" "${appname}")"
   else
