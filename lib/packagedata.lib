@@ -1,5 +1,5 @@
 ##############################################################################
-# Adebar © 2014, 2021 by Itzchak Rehberg
+# Adebar © 2014, 2022 by Itzchak Rehberg
 # This is part of the Adebar project, see https://codeberg.org/izzy/Adebar
 # Protected by the GPLv2
 # ----------------------------------------------------------------------------
@@ -370,7 +370,9 @@ getAppDetails() {
             if [[ "${zeile:0:24}" == "    install permissions:" || "${zeile:0:25}" == "    declared permissions:" || "${zeile:0:11}" == "    dexMode" || "${zeile:0:32}" == "    nativeLibraryRootRequiresIsa"
                || "${zeile:0:29}" == "    secondaryNativeLibraryDir" || "${zeile:0:20}" == "    nativeLibraryDir" || "${zeile:0:24}" == "    nativeLibraryRootDir" || "${zeile:0:26}" == "    legacyNativeLibraryDir"
                || "${zeile:0:10}" == "    splits" || "${zeile:0:16}" == "    compat name=" || "${zeile:0:18}" == "    forceQueryable" || "${zeile:0:19}" == "    queriesPackages"
-               || "${zeile:0:23}" == "    usesStaticLibraries" || "${zeile:0:20}" == "    usesLibraryFiles" || "${zeile:0:18}" == "    static library" || "${zeile:0:17}" == "    overlay paths" ]]; then
+               || "${zeile:0:23}" == "    usesStaticLibraries" || "${zeile:0:20}" == "    usesLibraryFiles" || "${zeile:0:18}" == "    static library" || "${zeile:0:17}" == "    overlay paths"
+               || "${zeile:0:38}" == "isSystemUserPackagesBlacklistSupported" ]]
+            then
               continue
             fi
 
