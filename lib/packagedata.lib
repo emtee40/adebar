@@ -521,44 +521,46 @@ function _mkStandardApps() {
   }
 
   local pkgname
+  local fallback
 
   echo "$(tab_classopen 'block')" >> "${mdfile}"
-  echo "$(trth2 'Standard Apps')" >> "${mdfile}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a com.android.contacts.action.LIST_ALL_CONTACTS |grep packageName|head -n 1)")"
-  _defAppLine "Contacts" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity tel://123456 |grep packageName|head -n 1)")"
-  _defAppLine "Dialer" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity mailto:john@example.com |grep packageName|head -n 1)")"
-  _defAppLine "Mail" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity http://www.example.com/ |grep packageName|head -n 1)")"
-  _defAppLine "Browser" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity sms://123456 |grep packageName|head -n 1)")"
-  _defAppLine "Messaging" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a android.intent.action.MUSIC_PLAYER |grep packageName|head -n 1)")"
-  _defAppLine "Music" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a android.media.action.IMAGE_CAPTURE |grep packageName|head -n 1)")"
-  _defAppLine "Camera" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -t image/* -a android.intent.action.PICK |grep packageName|head -n 1)")"
-  _defAppLine "Gallery" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -c android.intent.category.HOME -a android.intent.action.MAIN |grep packageName|head -n 1)")"
-  _defAppLine "Homescreen" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity geo:// |grep packageName|head -n 1)")"
-  _defAppLine "Maps" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity fdroid.app:// |grep packageName|head -n 1)")"
-  _defAppLine "F-Droid" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a android.telephony.action.EMERGENCY_ASSISTANCE |grep packageName|head -n 1)")"
-  _defAppLine "Emergency" "${pkgname}"
+  echo "$(trth2 "Standard Apps <b><sup><a href='${WIKI_BASE}/AppDetails-explained' title='Wiki'>ⓘ</a></sup></b></p>")" >> "${mdfile}"
+  _mkStandardApp "Contacts" "-a com.android.contacts.action.LIST_ALL_CONTACTS"
+  _mkStandardApp "Calendar" "-t vnd.android.cursor.item/event -a android.intent.action.VIEW"
+  _mkStandardApp "Dialer" "tel://123456"
+  _mkStandardApp "Mail" "mailto:john@example.com"
+  _mkStandardApp "Browser" "http://www.example.com/"
+  _mkStandardApp "Messaging" "sms://123456"
+  _mkStandardApp "Music" "-a android.intent.action.MUSIC_PLAYER"
+  _mkStandardApp "Camera" "-a android.media.action.IMAGE_CAPTURE"
+  _mkStandardApp "Gallery" "-t image/* -a android.intent.action.PICK"
+  _mkStandardApp "Homescreen" "-c android.intent.category.HOME -a android.intent.action.MAIN"
+  _mkStandardApp "Maps" "geo://"
+  _mkStandardApp "F-Droid" "fdroid.app://"
+  _mkStandardApp "Emergency" "-a android.telephony.action.EMERGENCY_ASSISTANCE"
 
   echo -e "$(tab_close)\n" >> "${mdfile}"
+}
+function _mkStandardApp() {
+  local name="$1"
+  local activity="$2"
+  local fallback=""
+  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity $activity |grep packageName|head -n 1)")"
+  [[ "${pkgname#packageName=*}" = "android" ]] && {
+    pkgname="$(trim "$(adb $ADBOPTS shell cmd package query-activities $activity |grep packageName|head -n 1)")"
+    fallback="*"
+  }
+  _defAppLine "${name}" "${pkgname}" "$fallback"
 }
 function _defAppLine() {
   local app=$1
   local pkgname=$2
+  local fallback=$3
   [[ -n "${pkgname}" ]] && {
     if [[ "${pkgname#packageName=*}" = "android" ]]; then
       echo "$(trthtd "$app" 'unknown')" >> "${mdfile}"
     else
-      echo "$(trthtd "$app" "$(_mkAppLink "${pkgname#packageName=*}" "$(_getSysAppName "${pkgname#packageName=*}")")")" >> "${mdfile}"
+      echo "$(trthtd "$app" "$(_mkAppLink "${pkgname#packageName=*}" "$(_getSysAppName "${pkgname#packageName=*}")${fallback}")")" >> "${mdfile}"
     fi
   }
 }
