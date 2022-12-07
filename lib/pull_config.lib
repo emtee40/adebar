@@ -70,6 +70,7 @@ getSettings() {
 
   # gps.conf, hosts
   msg="$((adb ${ADBOPTS} pull /system/etc/gps.conf "${CONFDIR}/gps.conf") 2>&1)"
+  [[ ! -f "${CONFDIR}/gps.conf" ]] && msg="$((adb ${ADBOPTS} pull /system/vendor/etc/gps.conf "${CONFDIR}/gps.conf") 2>&1)"
   doProgress "- gps.conf: $(trim "${msg##*]}")" 2
   msg="$((adb ${ADBOPTS} pull /system/etc/hosts "${CONFDIR}/hosts") 2>&1)"
   doProgress "- hosts: $(trim "${msg##*]}")" 2
