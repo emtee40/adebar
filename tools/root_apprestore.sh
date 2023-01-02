@@ -7,16 +7,35 @@
 #
 # If you're nuts enough to give this a try, please report your success.
 
+opts='s:h'
+
+ADBOPTS=
+HELP=0
+while getopts $opts arg; do
+  case $arg in
+    :) echo "$0 requires an argument:"; exit 1 ;;
+    s) if [[ -n "$(adb devices | grep $OPTARG)" ]]; then
+         ADBOPTS="-s $OPTARG"
+       else
+         echo "Device with serial $OPTARG is not present."
+         exit 2
+       fi ;;
+    h) HELP=1 ;;
+  esac
+done
+shift $((OPTIND-1))
+
 # --=[ Syntax ]=--
-[[ -z "$1" ]] && {
+[[ -z "$1" || $HELP -gt 0 ]] && {
   echo -e "\n\033[1;37mroot_backup\033[0m"
   echo "Restoring APK and data of a given app using root powers"
   echo
   echo "Syntax:"
-  echo -e "  $0 <packageName> [sourceDirectory]\n"
+  echo -e "  $0 [-s <serial>] <packageName> [sourceDirectory]\n"
   echo "Examples:"
   echo "  $0 com.foo.bar"
   echo -e "  $0 com.foo.bar backups\n"
+  [[ $HELP -gt 0 ]] && exit 0
   exit 1
 }
 
@@ -35,7 +54,7 @@ else
 fi
 
 # --=[ root-check ]=--
-adb shell "su -c 'ls /data'" >/dev/null 2>&1
+adb $ADBOPTS shell "su -c 'ls /data'" >/dev/null 2>&1
 rc=$?
 [[ $rc -ne 0 ]] && {
   echo -e "Sorry, looks like the device is not rooted: we cannot call to 'su'.\n"
@@ -64,41 +83,41 @@ set -ex
 
 # Install APK(s)
 if [[ -f "${BACKUPDIR}/${pkg}.apk" ]]; then
-    adb install "${BACKUPDIR}/${pkg}.apk"
+    adb $ADBOPTS install "${BACKUPDIR}/${pkg}.apk"
 elif [[ -d "${BACKUPDIR}/${pkg}" ]]; then
     multipath="${BACKUPDIR}/${pkg}/*.apk"
-    adb install-multiple $multipath
+    adb $ADBOPTS install-multiple $multipath
 else
     echo -e "Ooops! No APKs to install?\n"
     exit 99
 fi
 
 # Find the PKGUID to (later) own the data to. If we cannot identify it, processing should be stopped
-PKGUID=$(adb shell "su -c 'cat /data/system/packages.list'" | grep "${pkg} " | cut -d' ' -f2)
-[[ -z $PKGUID ]] && PKGUID=$(adb shell "dumpsys package ${pkg}" | grep "userId" | head -n1 | cut -d'=' -f2)
+PKGUID=$(adb $ADBOPTS shell "su -c 'cat /data/system/packages.list'" | grep "${pkg} " | cut -d' ' -f2)
+[[ -z $PKGUID ]] && PKGUID=$(adb $ADBOPTS shell "dumpsys package ${pkg}" | grep "userId" | head -n1 | cut -d'=' -f2)
 [[ $(echo "$PKGUID" | grep -E '^[0-9]+$') ]] || {   # UID must be numeric and not NULL
     echo "Cannot find PKGUID, exiting."
     exit 101
 }
 
 # Make sure the app closes and stays closed
-adb shell "su -c 'pm disable $pkg'"
-adb shell "su -c 'am force-stop $pkg'"
-adb shell "su -c 'pm clear $pkg'"
+adb $ADBOPTS shell "su -c 'pm disable $pkg'"
+adb $ADBOPTS shell "su -c 'am force-stop $pkg'"
+adb $ADBOPTS shell "su -c 'pm clear $pkg'"
 
 # Restore data files
-cat "$USER_TAR" | adb shell -e none -T "su -c 'tar xf -'"
-cat "$USER_DE_TAR" | adb shell -e none -T "su -c 'tar xf -'"
+cat "$USER_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
+cat "$USER_DE_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
 
 # Remove cache contents
-adb shell "su -c 'rm -rf /data/user{,_de}/0/${pkg}/{cache,code_cache}'"
+adb $ADBOPTS shell "su -c 'rm -rf /data/user{,_de}/0/${pkg}/{cache,code_cache}'"
 
 # Adapt to new UID
-adb shell "su -c 'chown -R $PKGUID:$PKGUID /data/user/0/${pkg} /data/user_de/0/${pkg}'"
+adb $ADBOPTS shell "su -c 'chown -R $PKGUID:$PKGUID /data/user/0/${pkg} /data/user_de/0/${pkg}'"
 
 # Restore SELinux contexts
-adb shell "su -c 'restorecon -F -R /data/user/0/${pkg}'"
-adb shell "su -c 'restorecon -F -R /data/user_de/0/${pkg}'"
+adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user/0/${pkg}'"
+adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user_de/0/${pkg}'"
 
 # Reenable package
-adb shell "su -c 'pm enable $pkg'"
+adb $ADBOPTS shell "su -c 'pm enable $pkg'"
