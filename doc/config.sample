@@ -142,6 +142,8 @@ APPNAME_CMD=""
 ROOT_COMPAT=0
 # Run "pm disable" and "pm enable" command as root?
 ROOT_PMDISABLE=0
+# Shall we use root_appbackup/root_apprestore instead of "adb backup"?
+ROOT_BACKUP=0
 # Wether backups should be automatically confirmed via keypresses send with adb
 # (set to 1 to enable)
 AUTO_CONFIRM=1

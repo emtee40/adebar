@@ -2,7 +2,7 @@
 # Adebar
 # (Android DEvice Backup And Restore)
 # Creating scripts to backup and restore your apps, settings, and more
-# © 2014-2020 by Andreas Itzchak Rehberg
+# © 2014-2023 by Andreas Itzchak Rehberg
 # Licensed using GPLv2 (see the file LICENSE which should have shipped with this)
 
 # #################################[ Configuration ]###
@@ -99,6 +99,7 @@ LINK_LATEST_SUBDIR=0
 KEEP_SUBDIR_GENERATIONS=0
 POSTRUN_CMD=""
 APPNAME_CMD=""
+ROOT_BACKUP=0
 ROOT_COMPAT=0
 ROOT_PMDISABLE=0
 AUTO_CONFIRM=0
@@ -246,6 +247,17 @@ if [ -n "${SERIAL}" ]; then
     fi
   fi
   ADBOPTS="-s ${SERIAL}"
+fi
+
+# Verify root access
+_testroot=$(adb shell su -c 'date' 2>/dev/null)
+if [[ $? -eq 0 ]]; then
+  HAVE_ROOT=1
+else
+  HAVE_ROOT=0
+  [[ ROOT_BACKUP -gt 0 ]] && { ROOT_BACKUP=0; echo -e "$(ansi_code "'su' not found on device, resetting ROOT_BACKUP to 0" "yellow")"; }
+  [[ ROOT_COMPAT -gt 0 ]] && { ROOT_COMPAT=0; echo -e "$(ansi_code "'su' not found on device, resetting ROOT_COMPAT to 0" "yellow")"; }
+  [[ ROOT_PMDISABLE -gt 0 ]] && { ROOT_PMDISABLE=0; echo -e "$(ansi_code "'su' not found on device, resetting ROOT_PMDISABLE to 0" "yellow")"; }
 fi
 
 # Check output directory and create it if it does not exist
