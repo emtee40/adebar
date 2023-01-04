@@ -5,6 +5,7 @@ ERROR_SYNTAX=1
 ERROR_DEVICE_MISSING=2
 ERROR_NO_ROOT=3
 ERROR_FILE_NOT_FOUND=5
+ERROR_NOT_INSTALLED=101
 
 opts='ns:h'
 
@@ -68,6 +69,12 @@ rc=$?
   echo -e "Sorry, looks like the device is not rooted: we cannot call to 'su'.\n"
   exit $ERROR_NO_ROOT
 }
+
+# --=[ make sure the app-tobebacke-up is installed at all ]=--
+if [[ -z "$(adb $ADBOPTS shell pm list packages|grep package:${pkg})" ]]; then
+  echo -e "According to 'pm list packages', a package named '${pkg}' is not installed so we cannot back it up.\n"
+  exit $ERROR_NOT_INSTALLED
+fi
 
 # --=[ Performing the backup ]=--
 echo "Backing up '$pkg' to directory: $BACKUPDIR"
