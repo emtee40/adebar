@@ -15,8 +15,8 @@ As a side-effect, *Adebar* generates a „report“ (or „short documentation�
 ## What kind of backup does *Adebar* create?
 *Adebar* itself does not create any backups. But it generates multiple files, including
 
-* a [shell script](http://en.wikipedia.org/wiki/Shell_script "Wikipedia: Shell script") to create separate ADB backups for the apps you've installed yourself ("user-apps"), including their `.apk` files and their data
-* a shell script to create ADB backups of system apps, only containing their data, plus shared storage
+* a [shell script](http://en.wikipedia.org/wiki/Shell_script "Wikipedia: Shell script") to create separate ADB (or root) backups for the apps you've installed yourself ("user-apps"), including their `.apk` files and their data
+* a shell script to create ADB (or root) backups of system apps, only containing their data, plus shared storage
 * a shell script to create disk images of your device's partitions (for rooted devices)
 * a shell script to download contents of your internal/external SDCards and Backups via Titanium Backup's built-in web server (for rooted devices)
 * a shell script to disable (freeze) all apps you had disabled/frozen on your device
