@@ -3,14 +3,34 @@
 # Some of them don't restore a backup if the app itself isn't yet installed
 # This script works around that by extracting and installing the APK
 # before calling 'adb restore'
-[[ -z "$1" ]] && {
-  echo -e "\n\033[1;37mabrestore\033[0"
+opts='s:h'
+
+ADBOPTS=
+HELP=0
+while getopts $opts arg; do
+  case $arg in
+    :) echo "$0 requires an argument:"; exit 1 ;;
+    s) if [[ -n "$(adb devices | grep $OPTARG)" ]]; then
+         ADBOPTS="-s $OPTARG"
+       else
+         echo "Device with serial $OPTARG is not present."
+         exit 2
+       fi ;;
+    h) HELP=1 ;;
+  esac
+done
+shift $((OPTIND-1))
+
+
+[[ -z "$1" || $HELP -gt 0 ]] && {
+  echo -e "\n\033[1;37mabrestore\033[0m"
   echo "Working around 'adb restore' issues on Nougat and above"
   echo
   echo "Syntax:"
-  echo -e "  $0 <ADB Backup File>\n"
+  echo -e "  $0 [-s <serial>] <ADB Backup File>\n"
   echo "Example:"
   echo -e "  $0 com.foo.bar.ab\n"
+  echo -e "  $0 -s 12345abc com.foo.bar.ab\n"
   exit 1
 }
 pkgname="${1%%.ab}"
@@ -18,6 +38,13 @@ pkgname="${1%%.ab}"
 if [[ "$(ldd "$(which openssl)" | grep '^[[:space:]]*libz\.')" ]]; then #"
     unzlib="openssl zlib -d"
 else
+    [[ -z "$(which zlib-flate)" ]] && {
+      echo "Cannot find openssl, or it is not configured with zlib support."
+      echo "zlib-flate cannot be found either, so we cannot uncompress the backup."
+      echo "On Linux, zlib-flate is part of the qpdf package."
+      echo
+      exit 5
+    }
     unzlib="zlib-flate -uncompress"
 fi
 
@@ -28,6 +55,6 @@ mv base.apk ${pkgname}.apk
 rm -f "${pkgname}".tar
 
 # Running Install and Restore
-adb install ${pkgname}.apk
+adb $ADBOPTS install ${pkgname}.apk
 [[ $? -eq 0 ]] && rm ${pkgname}.apk
-adb restore $1
+adb $ADBOPTS restore $1

@@ -15,8 +15,8 @@ As a side-effect, *Adebar* generates a „report“ (or „short documentation�
 ## What kind of backup does *Adebar* create?
 *Adebar* itself does not create any backups. But it generates multiple files, including
 
-* a [shell script](http://en.wikipedia.org/wiki/Shell_script "Wikipedia: Shell script") to create separate ADB backups for the apps you've installed yourself ("user-apps"), including their `.apk` files and their data
-* a shell script to create ADB backups of system apps, only containing their data, plus shared storage
+* a [shell script](http://en.wikipedia.org/wiki/Shell_script "Wikipedia: Shell script") to create separate ADB (or root) backups for the apps you've installed yourself ("user-apps"), including their `.apk` files and their data
+* a shell script to create ADB (or root) backups of system apps, only containing their data, plus shared storage
 * a shell script to create disk images of your device's partitions (for rooted devices)
 * a shell script to download contents of your internal/external SDCards and Backups via Titanium Backup's built-in web server (for rooted devices)
 * a shell script to disable (freeze) all apps you had disabled/frozen on your device
@@ -26,17 +26,20 @@ As a side-effect, *Adebar* generates a „report“ (or „short documentation�
 * a [HTML][2] file listing all user-installed apps with their sources you've installed them from (e.g. *Google Play*, *F-Droid*, *Aptoide*), date of first install/last update, installed version, and more – plus the same for the (pre-installed) system apps.
 * a [HTML][2] file with some general device documentation.
 
-Those three HTML files still have a `.md` file extension for historical reasons (before v2.0.0, they were created using [Markdown][4]). They are not complete HTML documents (no header, no footer); the example configuration in `doc/` has a user-function `uf_postrun()` taking care to assemble the pieces into one file which then will be a valid HTML document and thus have an `.html` file extension. Some examples of such "assembled device documentation pages" can be [found here](https://pages.codeberg.org/izzy/adebar/).
+Those three HTML files still have a `.md` file extension for historical reasons (before v2.0.0, they were created using [Markdown][4]). They are not complete HTML documents (no header, no footer); the example configuration in `doc/` has a user-function `uf_postrun()` taking care to assemble the pieces into one file which then will be a valid HTML document and thus have an `.html` file extension. Some examples of such „assembled device documentation pages“ can be [found here][5].
+
+**Note:** as the question came up: no, *Adebar*  does **not** rely on `packages.xml` to generate the device documentation – it works quite fine without root powers.
 
 ![Adebar-created files](https://codeberg.org/izzy/Adebar/wiki/raw/AdebarFiles.png)
 
-Optionally, if you have the PHP [CLI](https://en.wikipedia.org/wiki/Command-line_interface "Wikipedia: Command-line interface") available on your computer, you can parse the `packages.xml` with provided PHP scripts, located in the `tools/` directory. This directory also includes a few additional scripts:
+Optionally, if you have the PHP [CLI](https://en.wikipedia.org/wiki/Command-line_interface "Wikipedia: Command-line interface") available on your computer, you can parse the `packages.xml` (provided you were able to pull it: root required for that) with provided PHP scripts, located in the `tools/` directory. This directory also includes a few additional scripts:
 
 * `ab2tar`: shell script to convert ADB backup files into `.tar.gz` archives (requires `openssl` or `zlib-flate` and currently can only handle backups which were not password-protected)
 * `abrestore`: to help you if you have issues restoring ADB backups on Android 7 or higher (if your device is affected by the ADB restore bug, only restoring backups of apps already installed on the device)
 * `getapk`: grab the APK(s) for a given (group of) app(s) via ADB
 * `restoreapks`: restore all the APK's you have in a folder via ADB (as retrieved by `getapk`)
 * `mkdummy`: to create a "dummy device" from your real one (mainly intended for debug purposes: if you need assistance, you could zip/tar that after having it sanitized and attach it to an issue, or send it by other means)
+* `root_appbackup.sh`/`root_apprestore.sh`: if you have root powers, these might help you backing up / restoring any app and its data. Use with care!
 * `ssnap`: to create a series of screenshots from your device
 
 > **As I cannot test *Adebar* on all existing devices/ROMs, there might be some errors/bugs here and there (specific to a given device, ROM or newer Android version); if you encounter one, please file an issue at [the project's Codeberg presence][1]. General feedback is also more than welcome if you're successfully using *Adebar* with your device, see [List of tested devices](https://codeberg.org/izzy/Adebar/issues/7).**
@@ -79,7 +82,7 @@ errm… I mean, Credits and thanks:
 [2]: https://en.wikipedia.org/wiki/HTML "Wikipedia: HTML"
 [3]: https://codeberg.org/izzy/Adebar/wiki "Adebar Wiki at Codeberg"
 [4]: https://en.wikipedia.org/wiki/Markdown "Wikipedia: Markdown"
-[5]: https://pages.codeberg.org/izzy/adebar/ "Adebar DeviceDoc Examples"
+[5]: https://izzy.codeberg.page/adebar/ "Adebar DeviceDoc Examples"
 [6]: https://pixelfed.social/p/mondstern/244110717177958400 "Acrylic Logo by Mondstern"
 [7]: https://pixelfed.social/mondstern "Mondstern Acrylic Gallery"
 [8]: https://codeberg.org/mondstern/artworks/wiki/Codeberg "Codeberg projects in Mondstern's gallery"

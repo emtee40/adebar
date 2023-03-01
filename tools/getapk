@@ -10,26 +10,32 @@
   echo "all system apps, or all apps altogether – depending on what parameter"
   echo "you passed it."
   echo
-  echo "Syntax: $0 <package_name> | user | system | all"
+  echo "Syntax: $0 <package_name> | user | system | all [serial]"
   echo
   exit;
 }
 
+if [[ -n "$2" ]]; then
+  ADBCMD="adb -s $2"
+else
+  ADBCMD="adb"
+fi
+
 case $1 in
   all)
-    for i in $(adb shell pm list packages | awk -F':' '{print $2}'); do
+    for i in $(${ADBCMD} shell pm list packages | awk -F':' '{print $2}'); do
       $0 ${i//[$'\t\r\n']}
     done
     exit;
     ;;
   user)
-    for i in $(adb shell pm list packages -3 | awk -F':' '{print $2}'); do
+    for i in $(${ADBCMD} shell pm list packages -3 | awk -F':' '{print $2}'); do
       $0 ${i//[$'\t\r\n']}
     done
     exit;
     ;;
   system)
-    for i in $(adb shell pm list packages -s | awk -F':' '{print $2}'); do
+    for i in $(${ADBCMD} shell pm list packages -s | awk -F':' '{print $2}'); do
       $0 ${i//[$'\t\r\n']}
     done
     exit;
@@ -38,26 +44,26 @@ case $1 in
 esac
 
 # still here? then we have a package to deal with
-lines=$(adb shell pm path $pkgname | awk -F':' '{print $2}'|wc -l)
+lines=$(${ADBCMD} shell pm path $pkgname | awk -F':' '{print $2}'|wc -l)
 if [[ $lines -eq 0 ]]; then
   echo "No APK found for $pkgname"
   exit
 elif [[ $lines -gt 1 ]]; then
   echo "$pkgname is a split APK having $lines parts, using subdir"
   mkdir -p $pkgname
-  for path in $(adb shell pm path $pkgname | awk -F':' '{print $2}'); do
+  for path in $(${ADBCMD} shell pm path $pkgname | awk -F':' '{print $2}'); do
     path="${path//[$'\t\r\n']}"
     if [[ -n "$path" ]]; then
-      adb pull $path $pkgname/$(basename $path)
+      $ADBCMD pull $path $pkgname/$(basename $path)
     else
       echo "skipping empty path for split APK"
     fi
   done
 else
-  path=$(adb shell pm path $pkgname | awk -F':' '{print $2}')
+  path=$(${ADBCMD} shell pm path $pkgname | awk -F':' '{print $2}')
   path="${path//[$'\t\r\n']}"
   if [[ -n "$path" ]]; then
-    adb pull $path
+    $ADBCMD pull $path
     mv $(basename $path) ${pkgname}.apk
   else
     echo "Package $pkgname not found on device."

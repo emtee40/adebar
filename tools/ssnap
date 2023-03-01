@@ -13,12 +13,13 @@ function syntax() {
   echo "capture screenshots from an Android device connected via ADB"
   echo
   echo "Syntax:"
-  echo "  $0 [-b <baseName>] [-c <clockTime>] [-d <ImageDir>] [-p <packageName> [-h]"
+  echo "  $0 [-s <serial>] [-b <baseName>] [-c <clockTime>] [-d <ImageDir>] [-p <packageName> [-h]"
   echo "-b: base name of the screenshots (e.g. 'appname_')"
   echo "-c: time to set the Android clock to (4 digits; default: current year)"
   echo "    use e.g. to show the app version the screenshots are taken of"
   echo "-d: where to store the screenshots (default: current working dir)"
   echo "-p: use monkey to start the specified app"
+  echo "-s: specify the serial of the device to be used (useful when multiple devices are connected)"
   echo "-h: show this help and exit"
   echo
   echo "Examples:"
@@ -30,27 +31,27 @@ function syntax() {
 
 # enable demo mode
 function demo_on() {
-  adb shell settings put global sysui_demo_allowed 1
-  adb shell am broadcast -a com.android.systemui.demo -e command enter
-  adb shell am broadcast -a com.android.systemui.demo -e command clock -e hhmm $clockVer
-  adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
-  adb shell am broadcast -a com.android.systemui.demo -e command battery -e level 100
-  adb shell am broadcast -a com.android.systemui.demo -e command network -e wifi show -e level 4
-  adb shell am broadcast -a com.android.systemui.demo -e command network -e mobile show -e datatype none -e level 4
+  adb $ADBOPTS shell settings put global sysui_demo_allowed 1
+  adb $ADBOPTS shell am broadcast -a com.android.systemui.demo -e command enter
+  adb $ADBOPTS shell am broadcast -a com.android.systemui.demo -e command clock -e hhmm $clockVer
+  adb $ADBOPTS shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
+  adb $ADBOPTS shell am broadcast -a com.android.systemui.demo -e command battery -e level 100
+  adb $ADBOPTS shell am broadcast -a com.android.systemui.demo -e command network -e wifi show -e level 4
+  adb $ADBOPTS shell am broadcast -a com.android.systemui.demo -e command network -e mobile show -e datatype none -e level 4
 }
 
 # disable demo mode
 function demo_off() {
-  adb shell am broadcast -a com.android.systemui.demo -e command exit
-  adb shell settings put global sysui_demo_allowed 0
+  adb $ADBOPTS shell am broadcast -a com.android.systemui.demo -e command exit
+  adb $ADBOPTS shell settings put global sysui_demo_allowed 0
 }
 
 # wake up device
 function wake_up() {
   echo "Waking up device (just in case)"
   # adb shell input keyevent KEYCODE_POWER  # toggle on/off
-  adb shell input keyevent KEYCODE_WAKEUP   # in case the screen is off
-  adb shell input keyevent 82               # swipe-only: unlock
+  adb $ADBOPTS shell input keyevent KEYCODE_WAKEUP   # in case the screen is off
+  adb $ADBOPTS shell input keyevent 82               # swipe-only: unlock
   # adb shell input touchscreen swipe 930 880 930 380 # swipe up, see https://stackoverflow.com/questions/29072501 for more
   # adb shell input keyevent 26 && adb shell input touchscreen swipe 930 880 930 380 # nope either
   sleep 2
@@ -59,7 +60,8 @@ function wake_up() {
 
 # -------------------------------------------------------------=[ Main ]=--
 # read command line options (if any)
-while getopts "b:c:d:p:h" sopt; do
+ADBOPTS=
+while getopts "b:c:d:p:s:h" sopt; do
   case "${sopt}" in
     b) BaseName="${OPTARG}" ;;
     c) clockVer="${OPTARG}"
@@ -76,6 +78,8 @@ while getopts "b:c:d:p:h" sopt; do
        }
        ;;
     p) packageName="${OPTARG}" ;;
+    s) SERIAL="${OPTARG}"
+       ADBOPTS="-s ${OPTARG}" ;;
     h) syntax ;;
     :) echo "Error: -${OPTARG} requires an argument."
        exit 1
@@ -87,11 +91,21 @@ while getopts "b:c:d:p:h" sopt; do
 done
 
 # make sure there's an Android device connected via ADB
-[[ $(adb devices|wc -l) -lt 3 ]] && {
+if [[ -n "${ADBOPTS}" ]]; then
+  if [[ -z "$(adb devices | grep $SERIAL)" ]]; then
+    echo "The Android device with the serial '$SERIAL' is not connected. Make sure you connect it via ADB."
+    echo
+    exit 1
+  fi
+elif [[ $(adb devices|wc -l) -lt 3 ]]; then
   echo "No Android device found. Make sure you connect one via ADB."
   echo
   exit 1
-}
+elif [[ $(adb devices|wc -l) -gt 3 ]]; then
+  echo "Multiple Android devices found. Either disconnect all but one, or specify the one to use via '-s <serial>'."
+  echo
+  exit 1
+fi
 
 # initialize variables
 clockVer=${clockVer:-$(date +%Y)}
@@ -121,13 +135,13 @@ demo_on >/dev/null
 [[ -n "$packageName" ]] && {
   wake_up
   echo "Using Monkey to start '$packageName'"
-  adb shell "monkey -p $packageName -c android.intent.category.LAUNCHER 1" >/dev/null
+  adb $ADBOPTS shell "monkey -p $packageName -c android.intent.category.LAUNCHER 1" >/dev/null
   sleep 5
 }
 
 while [[ "$action" = "s" ]]; do
   i+=1
-  adb shell screencap -p > "${IMGDIR}/${BaseName}${i}.png"
+  adb $ADBOPTS shell screencap -p > "${IMGDIR}/${BaseName}${i}.png"
   [[ -z $(which optipng) ]] && optipng "${IMGDIR}/${BaseName}${i}.png"
   echo "'${IMGDIR}/${BaseName}${i}.png' created."
   read -n 1 -p "Action: [s]nap, [q]uit " action

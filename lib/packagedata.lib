@@ -1,5 +1,5 @@
 ##############################################################################
-# Adebar © 2014, 2020 by Itzchak Rehberg
+# Adebar © 2014, 2022 by Itzchak Rehberg
 # This is part of the Adebar project, see https://codeberg.org/izzy/Adebar
 # Protected by the GPLv2
 # ----------------------------------------------------------------------------
@@ -8,7 +8,7 @@
 
 # Mapping AndroidSDK to AndroidVersion
 # SDK                                   5                               10                              15                              20                            25                            30
-SDK2VER=("0" "1.0" "1.1" "1.5" "1.6" "2.0" "2.0.1" "2.1" "2.2" "2.3" "2.3.3" "3.0" "3.1" "3.2" "4.0" "4.0.3" "4.1" "4.2" "4.3" "4.4" "4.4W" "5.0" "5.1" "6.0" "7.0" "7.1" "8.0" "8.1" "9.0" "10.0" "11.0")
+SDK2VER=("0" "1.0" "1.1" "1.5" "1.6" "2.0" "2.0.1" "2.1" "2.2" "2.3" "2.3.3" "3.0" "3.1" "3.2" "4.0" "4.0.3" "4.1" "4.2" "4.3" "4.4" "4.4W" "5.0" "5.1" "6.0" "7.0" "7.1" "8.0" "8.1" "9.0" "10.0" "11.0" "12.0" "12L" "13.0")
 
 #
 # Get app names by package names (if possible)
@@ -370,7 +370,9 @@ getAppDetails() {
             if [[ "${zeile:0:24}" == "    install permissions:" || "${zeile:0:25}" == "    declared permissions:" || "${zeile:0:11}" == "    dexMode" || "${zeile:0:32}" == "    nativeLibraryRootRequiresIsa"
                || "${zeile:0:29}" == "    secondaryNativeLibraryDir" || "${zeile:0:20}" == "    nativeLibraryDir" || "${zeile:0:24}" == "    nativeLibraryRootDir" || "${zeile:0:26}" == "    legacyNativeLibraryDir"
                || "${zeile:0:10}" == "    splits" || "${zeile:0:16}" == "    compat name=" || "${zeile:0:18}" == "    forceQueryable" || "${zeile:0:19}" == "    queriesPackages"
-               || "${zeile:0:23}" == "    usesStaticLibraries" || "${zeile:0:20}" == "    usesLibraryFiles" || "${zeile:0:18}" == "    static library" || "${zeile:0:17}" == "    overlay paths" ]]; then
+               || "${zeile:0:23}" == "    usesStaticLibraries" || "${zeile:0:20}" == "    usesLibraryFiles" || "${zeile:0:18}" == "    static library" || "${zeile:0:17}" == "    overlay paths"
+               || "${zeile:0:38}" == "isSystemUserPackagesBlacklistSupported" ]]
+            then
               continue
             fi
 
@@ -431,6 +433,9 @@ getAppDetails() {
       "enabled") # enabled components of current pkg
         if [[ "${zeile:0:6}" = "      " ]]; then
           continue # we don't include enabled components
+        fi
+        if [[ -z "${zeile}" ]]; then
+          continue # skip empty lines
         fi
         if [[ "${zeile}" = "    grantedPermissions:" ]]; then
           P_BLOCK="perms"
@@ -516,40 +521,46 @@ function _mkStandardApps() {
   }
 
   local pkgname
+  local fallback
 
   echo "$(tab_classopen 'block')" >> "${mdfile}"
-  echo "$(trth2 'Standard Apps')" >> "${mdfile}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a com.android.contacts.action.LIST_ALL_CONTACTS |grep packageName|head -n 1)")"
-  _defAppLine "Contacts" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity tel://123456 |grep packageName|head -n 1)")"
-  _defAppLine "Dialer" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity mailto:john@example.com |grep packageName|head -n 1)")"
-  _defAppLine "Mail" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity http://www.example.com/ |grep packageName|head -n 1)")"
-  _defAppLine "Browser" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity sms://123456 |grep packageName|head -n 1)")"
-  _defAppLine "Messaging" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a android.intent.action.MUSIC_PLAYER |grep packageName|head -n 1)")"
-  _defAppLine "Music" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a android.media.action.IMAGE_CAPTURE |grep packageName|head -n 1)")"
-  _defAppLine "Camera" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -t image/* -a android.intent.action.PICK |grep packageName|head -n 1)")"
-  _defAppLine "Gallery" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -c android.intent.category.HOME -a android.intent.action.MAIN |grep packageName|head -n 1)")"
-  _defAppLine "Homescreen" "${pkgname}"
-  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity -a android.telephony.action.EMERGENCY_ASSISTANCE |grep packageName|head -n 1)")"
-  _defAppLine "Emergency" "${pkgname}"
+  echo "$(trth2 "Standard Apps <b><sup><a href='${WIKI_BASE}/AppDetails-explained' title='Wiki'>ⓘ</a></sup></b></p>")" >> "${mdfile}"
+  _mkStandardApp "Contacts" "-a com.android.contacts.action.LIST_ALL_CONTACTS"
+  _mkStandardApp "Calendar" "-t vnd.android.cursor.item/event -a android.intent.action.VIEW"
+  _mkStandardApp "Dialer" "tel://123456"
+  _mkStandardApp "Mail" "mailto:john@example.com"
+  _mkStandardApp "Browser" "http://www.example.com/"
+  _mkStandardApp "Messaging" "sms://123456"
+  _mkStandardApp "Music" "-a android.intent.action.MUSIC_PLAYER"
+  _mkStandardApp "Camera" "-a android.media.action.IMAGE_CAPTURE"
+  _mkStandardApp "Gallery" "-t image/* -a android.intent.action.PICK"
+  _mkStandardApp "Homescreen" "-c android.intent.category.HOME -a android.intent.action.MAIN"
+  _mkStandardApp "Maps" "geo://"
+  _mkStandardApp "F-Droid" "fdroid.app://"
+  _mkStandardApp "Emergency" "-a android.telephony.action.EMERGENCY_ASSISTANCE"
 
   echo -e "$(tab_close)\n" >> "${mdfile}"
+}
+function _mkStandardApp() {
+  local name="$1"
+  local activity="$2"
+  local fallback=""
+  pkgname="$(trim "$(adb $ADBOPTS shell cmd package resolve-activity $activity |grep packageName|head -n 1)")"
+  [[ "${pkgname#packageName=*}" = "android" ]] && {
+    pkgname="$(trim "$(adb $ADBOPTS shell cmd package query-activities $activity |grep packageName|head -n 1)")"
+    fallback="*"
+  }
+  _defAppLine "${name}" "${pkgname}" "$fallback"
 }
 function _defAppLine() {
   local app=$1
   local pkgname=$2
+  local fallback=$3
   [[ -n "${pkgname}" ]] && {
     if [[ "${pkgname#packageName=*}" = "android" ]]; then
       echo "$(trthtd "$app" 'unknown')" >> "${mdfile}"
     else
-      echo "$(trthtd "$app" "$(_mkAppLink "${pkgname#packageName=*}" "$(_getSysAppName "${pkgname#packageName=*}")")")" >> "${mdfile}"
+      echo "$(trthtd "$app" "$(_mkAppLink "${pkgname#packageName=*}" "$(_getSysAppName "${pkgname#packageName=*}")${fallback}")")" >> "${mdfile}"
     fi
   }
 }
@@ -664,8 +675,11 @@ function _mkAppLink() {
   local pkgname=$1
   local appname="$2"
   local link
+  local installer=${PK_INSTALLER[$pkgname]}
   if [[ "${appname}" = "${pkgname}" || -z "${appname}" ]]; then
     link=$pkgname
+  elif [[ -n "$installer" && -n "${APP_MARKET_URL[$installer]}" ]]; then
+    link="$(href "${APP_MARKET_URL[$installer]/\%s/${pkgname}}" "${appname}")"
   elif [[ -n "${APP_MARKET_URL[unknown]}" ]]; then
     link="$(href "${APP_MARKET_URL[unknown]/\%s/${pkgname}}" "${appname}")"
   else
@@ -747,7 +761,7 @@ function _makeAppDoc() {
   local CUR_INSTALLER
   local APPNAME
   for app in ${applist[@]}; do
-    if [[ ("$1" = "system" || "$1" = "uninst" || "$1" = "disabled") && -n "${APPCACHESPLUS}" ]]; then
+    if [[ ("$1" = "system" || "$1" = "uninst" || "$1" = "disabled" || "$1" = "user") && -n "${APPCACHESPLUS}" ]]; then
       for appcache in ${APPCACHESPLUS}; do
         APPNAME=$(getAppname "${app}" "${PK_CODEPATH[$app]}" $_retrieveAppNames "${appcache}")
         [[ "${APPNAME}" != "${app}" ]] && break;
