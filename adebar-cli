@@ -14,6 +14,7 @@ SYSDIR="sysApps"
 PARTBACKUPDIR="images"
 DOCDIR="docs"
 CONFDIR="conf"
+DATADIR="data"
 CACHEDIR=""
 APPCACHESPLUS=""
 TRANSFER_DIR=""
@@ -47,6 +48,7 @@ MK_AUTOCONFIRM_SEQUENCE=(22 23)
 MK_XPRIVACY_EXPORT=0
 MK_XPRIVACY_PULL=0
 PULL_SETTINGS=1
+PULL_DATA=1
 MK_TIBU=0
 MK_DEFAULTAPPS=1
 MK_USERAPPS=1
@@ -262,6 +264,7 @@ if [ -n "${STORAGE_BASE}" ]; then
 fi
 DOCDIR="${OUTDIR}/${DOCDIR}"
 CONFDIR="${OUTDIR}/${CONFDIR}"
+DATADIR="${OUTDIR}/${DATADIR}"
 PKGXML="${CONFDIR}/packages.xml"
 BUILDPROP="${CONFDIR}/build.prop"
 if [ ! -d "${DOCDIR}" ]; then
@@ -271,6 +274,7 @@ if [ ! -d "${DOCDIR}" ]; then
     exit 5
   }
   mkdir -p "${CONFDIR}"
+  mkdir -p "${DATADIR}"
 fi
 
 # What Android version shall we assume (for specific features)? Do not evaluate if user has configured an override.
@@ -293,6 +297,7 @@ DEVICE_SDKVER=${DEVICE_SDKVER//[$'\t\r\n']}
 . "${LIBDIR}/dummydevs.lib"
 [[ $((${MK_PARTINFO} + ${MK_PARTBACKUP})) -gt 0 ]] && . "${LIBDIR}/partitions.lib"
 [[ $(($PULL_SETTINGS + $MK_XPRIVACY_EXPORT + $MK_XPRIVACY_PULL)) -gt 0 ]] && . "${LIBDIR}/pull_config.lib"
+[[ $PULL_DATA -gt 0 ]] && . "${LIBDIR}/pull_data.lib"
 [[ $MK_TIBU -eq 1 ]] && . "${LIBDIR}/tibu.lib"
 [[ $((${MK_APPDISABLE} + ${MK_APPENABLE} + ${MK_USERBACKUP} + ${MK_SYSBACKUP} + ${MK_INSTALLLOC})) -gt 0 ]] && . "${LIBDIR}/scriptgen.lib"
 [[ ${MK_DEVICEINFO} -gt 0 ]] && . "${LIBDIR}/deviceinfo.lib"
@@ -449,6 +454,7 @@ initAppLists
 [[ ${MK_PARTBACKUP} -gt 0 ]] && writePartDumpScript
 [[ ${MK_DEVICEINFO} -gt 0 ]] && getDeviceInfo
 [[ $PULL_SETTINGS -eq 1 ]] && getSettings
+[[ $PULL_DATA -eq 1 ]] && getData
 [[ $(($MK_XPRIVACY_EXPORT + $MK_XPRIVACY_PULL)) -gt 0 ]] && getXPrivacy
 [[ $MK_TIBU -eq 1 ]] && getTibu
 [[ -n "${TRANSFER_DIR}" ]] && doTransfer

@@ -1,0 +1,31 @@
+##############################################################################
+# Adebar © 2014-2023 by Itzchak Rehberg
+# This is part of the Adebar project, see https://codeberg.org/izzy/Adebar
+# Protected by the GPLv2
+# ----------------------------------------------------------------------------
+# library to pull data from the device
+##############################################################################
+
+#
+# Get SMS
+#
+getSMS() {
+  [ $PULL_DATA -ne 1 ] && return
+  doProgress "- SMS" 2
+
+  local msg
+  local fields=( address date body thread_id person protocol read status type reply_path_present subject service_center locked date_sent error_code )
+  local projection="_id"
+
+  for field in ${fields[@]}; do
+    projection="${projection}:${field}"
+  done
+
+  adb ${ADBOPTS} shell "content query --uri content://sms/ --projection ${projection}" > ${DATADIR}/sms.lst
+}
+
+getData() {
+  [ $PULL_DATA -ne 1 ] && return
+  doProgress "Pulling Data"
+  getSMS
+}

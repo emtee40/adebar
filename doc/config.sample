@@ -17,6 +17,8 @@ PARTBACKUPDIR="images"
 DOCDIR="docs"
 # similar for pulled configuration files
 CONFDIR="conf"
+# and for data pulled, e.g. SMS
+DATADIR="data"
 # where Adebar stores information between runs, e.g. app names
 CACHEDIR=""
 # additional cache dirs for Bloatware and other pre-installed stuff (space separated list
@@ -76,6 +78,8 @@ MK_XPRIVACY_EXPORT=0
 MK_XPRIVACY_PULL=0
 # pull settings/configs from the device
 PULL_SETTINGS=1
+# pull data (e.g. SMS)
+PULL_DATA=1
 # create the script to pull stuff from the TiBu web server
 MK_TIBU=0
 # process package information via dumpsys and generate userApps.md/sysApps.md/uninstApps.md
