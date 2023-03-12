@@ -13,7 +13,7 @@
 # Parse arguments
 if ( !isset($argv[2]) ) {
   echo "\nSyntax: ".$argv[0]." <type> <infile> [<outfile>]\n\n";
-  echo "  Type: sms|calls|cellbroadcasts\n\n";
+  echo "  Type: sms|calls|cellbroadcasts|userdict\n\n";
   exit;
 }
 
@@ -35,6 +35,10 @@ switch ($type) {
   case "sms"  :
     if (empty($outfile)) $outfile = 'sms.json';
     $fields=["_id","thread_id","address","person","date","date_sent","protocol","read","status","type","reply_path_present","subject","body","service_center","locked","sub_id","error_code","creator","seen","priority"];
+    break;
+  case "userdict":
+    if (empty($outfile)) $outfile = 'userdict.json';
+    $fields=["_id","word","frequency","locale","appid","shortcut"];
     break;
   default     :
     echo "Wrong type '$type'. Valid types are: calls,sms.\n\n";

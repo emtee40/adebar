@@ -7,6 +7,20 @@
 ##############################################################################
 
 #
+# Helper to set up projection list
+#
+_mkProjection() {
+  local fields=( $@ )
+  local projection="_id"
+
+  for field in ${fields[@]}; do
+    projection="${projection}:${field}"
+  done
+
+  echo $projection
+}
+
+#
 # Get Call-Log
 #
 getCallLog() {
@@ -14,31 +28,19 @@ getCallLog() {
   [[ $HAVE_ROOT -ne 1 ]] && return
   doProgress "- CallLog" 2
 
-  local fields=( type number formatted_number numbertype via_number numberlabel normalized_number matched_number countryiso geocoded_location date last_modified name phone_account_address lookup_uri voicemail_uri is_read photo_id photo_uri post_dial_digits call_screening_app_name call_screening_component_name transcription transcription_state block_reason subscription_id subscription_component_name add_for_all_users features new presentation data_usage )
-  local projection="_id"
-
-  for field in ${fields[@]}; do
-    projection="${projection}:${field}"
-  done
-
+  local projection="$(_mkProjection type number formatted_number numbertype via_number numberlabel normalized_number matched_number countryiso geocoded_location date last_modified name phone_account_address lookup_uri voicemail_uri is_read photo_id photo_uri post_dial_digits call_screening_app_name call_screening_component_name transcription transcription_state block_reason subscription_id subscription_component_name add_for_all_users features new presentation data_usage)"
   adb ${ADBOPTS} shell su -c "content query --uri content://call_log/calls --projection ${projection}" > ${DATADIR}/calllog.lst
 }
 
 #
-# Get Sell Broadcasts
+# Get Cell Broadcasts
 #
 getCBC() {
   [[ $PULL_DATA -ne 1 ]] && return
   [[ $HAVE_ROOT -ne 1 ]] && return
   doProgress "- Cell Broadcasts" 2
 
-  local fields=( geo_scope plmn lac cid serial_number service_category language body date read format priority etws_warning_type cmas_message_class cmas_category cmas_response_type cmas_severity cmas_urgency cmas_certainty )
-  local projection="_id"
-
-  for field in ${fields[@]}; do
-    projection="${projection}:${field}"
-  done
-
+  local projection="$(_mkProjection geo_scope plmn lac cid serial_number service_category language body date read format priority etws_warning_type cmas_message_class cmas_category cmas_response_type cmas_severity cmas_urgency cmas_certainty)"
   adb ${ADBOPTS} shell su -c "content query --uri content://cellbroadcasts --projection ${projection}" > ${DATADIR}/cellbroadcasts.lst
 }
 
@@ -50,21 +52,30 @@ getSMS() {
   [ $PULL_DATA -ne 1 ] && return
   doProgress "- SMS" 2
 
-  local msg
-  local fields=( thread_id address person date date_sent protocol read status type reply_path_present subject body service_center locked sub_id error_code creator seen priority )
-  local projection="_id"
-
-  for field in ${fields[@]}; do
-    projection="${projection}:${field}"
-  done
-
+  local projection=$(_mkProjection thread_id address person date date_sent protocol read status type reply_path_present subject body service_center locked sub_id error_code creator seen priority)
   adb ${ADBOPTS} shell "content query --uri content://sms/ --projection ${projection}" > ${DATADIR}/sms.lst
 }
 
+#
+# Get UserDictionary
+#
+getUserDict() {
+  [[ $PULL_DATA -ne 1 ]] && return
+  [[ $HAVE_ROOT -ne 1 ]] && return
+  doProgress "- User Dictionary" 2
+
+  local projection="$(_mkProjection word frequency locale appid shortcut)"
+  adb ${ADBOPTS} shell su -c "content query --uri content://user_dictionary/words --projection ${projection}" > ${DATADIR}/userdict.lst
+}
+
+#
+# Main
+#
 getData() {
   [ $PULL_DATA -ne 1 ] && return
   doProgress "Pulling Data"
   getSMS
   getCBC
   getCallLog
+  getUserDict
 }
