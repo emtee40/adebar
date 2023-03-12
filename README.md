@@ -22,6 +22,7 @@ As a side-effect, *Adebar* generates a „report“ (or „short documentation�
 * a shell script to disable (freeze) all apps you had disabled/frozen on your device
 * it pulls the `wpa_supplicant.conf` from your device, which holds information on all WiFi APs you've configured (root required) – and also some more configuration files.
 * it pulls the `packages.xml` from your device, which holds all information about apps installed on your device (with Android 4.1 and above, this again requires root)
+* it pulls some data from your device. Currently Call-Logs (root needed) and SMS, in the future maybe more.
 * a shell script to disable all broadcast receivers (aka "auto-starts") which were disabled on the given device
 * a [HTML][2] file listing all user-installed apps with their sources you've installed them from (e.g. *Google Play*, *F-Droid*, *Aptoide*), date of first install/last update, installed version, and more – plus the same for the (pre-installed) system apps.
 * a [HTML][2] file with some general device documentation.
@@ -40,6 +41,7 @@ Optionally, if you have the PHP [CLI](https://en.wikipedia.org/wiki/Command-line
 * `restoreapks`: restore all the APK's you have in a folder via ADB (as retrieved by `getapk`)
 * `mkdummy`: to create a "dummy device" from your real one (mainly intended for debug purposes: if you need assistance, you could zip/tar that after having it sanitized and attach it to an issue, or send it by other means)
 * `root_appbackup.sh`/`root_apprestore.sh`: if you have root powers, these might help you backing up / restoring any app and its data. Use with care!
+* `lst2json.php`: lets you convert the `calllog.lst` and `sms.lst` pulled from your device to JSON, for easier processing with other tools
 * `ssnap`: to create a series of screenshots from your device
 
 > **As I cannot test *Adebar* on all existing devices/ROMs, there might be some errors/bugs here and there (specific to a given device, ROM or newer Android version); if you encounter one, please file an issue at [the project's Codeberg presence][1]. General feedback is also more than welcome if you're successfully using *Adebar* with your device, see [List of tested devices](https://codeberg.org/izzy/Adebar/issues/7).**

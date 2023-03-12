@@ -7,6 +7,24 @@
 ##############################################################################
 
 #
+# Get Call-Log
+#
+getCallLog() {
+  [[ $PULL_DATA -ne 1 ]] && return
+  [[ $HAVE_ROOT -ne 1 ]] && return
+  doProgress "- CallLog" 2
+
+  local fields=( type number formatted_number numbertype via_number numberlabel normalized_number matched_number countryiso geocoded_location date last_modified name phone_account_address lookup_uri voicemail_uri is_read photo_id photo_uri post_dial_digits call_screening_app_name call_screening_component_name transcription transcription_state block_reason subscription_id subscription_component_name add_for_all_users features new presentation data_usage )
+  local projection="_id"
+
+  for field in ${fields[@]}; do
+    projection="${projection}:${field}"
+  done
+
+  adb ${ADBOPTS} shell su -c "content query --uri content://call_log/calls --projection ${projection}" > ${DATADIR}/calllog.lst
+}
+
+#
 # Get SMS
 #
 getSMS() {
@@ -28,4 +46,5 @@ getData() {
   [ $PULL_DATA -ne 1 ] && return
   doProgress "Pulling Data"
   getSMS
+  getCallLog
 }

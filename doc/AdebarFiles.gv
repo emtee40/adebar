@@ -8,13 +8,25 @@ digraph AdebarFiles {
   subgraph cluster_conf {
     rankdir = LR;
     style = filled;
-    color = "#ffeeaa";
+    color = "#26f707";
     node [ style=filled, color=blue, fillcolor=white ];
     label = "files pulled from the device";
 
     conf [ shape = folder, label = "./conf" ];
     conffiles [ shape = Mrecord, fontsize = 11, label = "build.prop|gps.conf|hosts|packages.xml|wpa_supplicant.conf|softap.conf|xprivacy.xml.gz|xprivacy_dbs.tar.gz" ];
     conf -> conffiles;
+  }
+
+  subgraph cluster_data {
+    rankdir = LR;
+    style = filled;
+    color = "#ffeeaa";
+    node [ style=filled, color=blue, fillcolor=white ];
+    label = "data pulled from the device";
+
+    data [ shape = folder, label = "./data" ];
+    datafiles [ shape = Mrecord, fontsize = 11, label = "calllog.lst|sms.lst" ];
+    data -> datafiles;
   }
 
   subgraph cluster_doc {
@@ -43,6 +55,7 @@ digraph AdebarFiles {
 
   Adebar [ shape = component ];
   Adebar -> conf;
+  Adebar -> data;
   Adebar -> docs;
   Adebar -> scripts;
 
