@@ -29,7 +29,7 @@ switch ($type) {
     break;
   case "sms"  :
     if (empty($outfile)) $outfile = 'sms.json';
-    $fields=["_id","address","date","body","thread_id","person","protocol","read","status","type","reply_path_present","subject","service_center","locked","date_sent","error_code"];
+    $fields=["_id","thread_id","address","person","date","date_sent","protocol","read","status","type","reply_path_present","subject","body","service_center","locked","sub_id","error_code","creator","seen","priority"];
     break;
   default     :
     echo "Wrong type '$type'. Valid types are: calls,sms.\n\n";

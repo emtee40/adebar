@@ -32,7 +32,7 @@ getSMS() {
   doProgress "- SMS" 2
 
   local msg
-  local fields=( address date body thread_id person protocol read status type reply_path_present subject service_center locked date_sent error_code )
+  local fields=( thread_id address person date date_sent protocol read status type reply_path_present subject body service_center locked sub_id error_code creator seen priority )
   local projection="_id"
 
   for field in ${fields[@]}; do
