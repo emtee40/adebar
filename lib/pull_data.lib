@@ -25,6 +25,25 @@ getCallLog() {
 }
 
 #
+# Get Sell Broadcasts
+#
+getCBC() {
+  [[ $PULL_DATA -ne 1 ]] && return
+  [[ $HAVE_ROOT -ne 1 ]] && return
+  doProgress "- Cell Broadcasts" 2
+
+  local fields=( geo_scope plmn lac cid serial_number service_category language body date read format priority etws_warning_type cmas_message_class cmas_category cmas_response_type cmas_severity cmas_urgency cmas_certainty )
+  local projection="_id"
+
+  for field in ${fields[@]}; do
+    projection="${projection}:${field}"
+  done
+
+  adb ${ADBOPTS} shell su -c "content query --uri content://cellbroadcasts --projection ${projection}" > ${DATADIR}/cellbroadcasts.lst
+}
+
+
+#
 # Get SMS
 #
 getSMS() {
@@ -46,5 +65,6 @@ getData() {
   [ $PULL_DATA -ne 1 ] && return
   doProgress "Pulling Data"
   getSMS
+  getCBC
   getCallLog
 }

@@ -13,7 +13,7 @@
 # Parse arguments
 if ( !isset($argv[2]) ) {
   echo "\nSyntax: ".$argv[0]." <type> <infile> [<outfile>]\n\n";
-  echo "  Type: sms|calls\n\n";
+  echo "  Type: sms|calls|cellbroadcasts\n\n";
   exit;
 }
 
@@ -26,6 +26,11 @@ switch ($type) {
   case "calls":
     if (empty($outfile)) $outfile = 'calllog.json';
     $fields=["_id","type","number","formatted_number","numbertype","via_number","numberlabel","normalized_number","matched_number","countryiso","geocoded_location","date","last_modified","name","phone_account_address","lookup_uri","voicemail_uri","is_read","photo_id","photo_uri","post_dial_digits","call_screening_app_name","call_screening_component_name","transcription","transcription_state","block_reason","subscription_id","subscription_component_name","add_for_all_users","features","new","presentation","data_usage"];
+    break;
+  case "cbc"  :
+  case "cellbroadcasts":
+    if (empty($outfile)) $outfile = 'cellbroadcasts.json';
+    $fields=["_id","geo_scope","plmn","lac","cid","serial_number","service_category","language","body","date","read","format","priority","etws_warning_type","cmas_message_class","cmas_category","cmas_response_type","cmas_severity","cmas_urgency","cmas_certainty"];
     break;
   case "sms"  :
     if (empty($outfile)) $outfile = 'sms.json';

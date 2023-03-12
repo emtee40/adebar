@@ -25,7 +25,7 @@ digraph AdebarFiles {
     label = "data pulled from the device";
 
     data [ shape = folder, label = "./data" ];
-    datafiles [ shape = Mrecord, fontsize = 11, label = "calllog.lst|sms.lst" ];
+    datafiles [ shape = Mrecord, fontsize = 11, label = "calllog.lst|cellbroadcasts.lst|sms.lst" ];
     data -> datafiles;
   }
 
