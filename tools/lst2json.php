@@ -13,7 +13,7 @@
 # Parse arguments
 if ( !isset($argv[2]) ) {
   echo "\nSyntax: ".$argv[0]." <type> <infile> [<outfile>]\n\n";
-  echo "  Type: sms|calls|cellbroadcasts|userdict\n\n";
+  echo "  Type: sms|calls|cellbroadcasts|userdict|settings\n\n";
   exit;
 }
 
@@ -39,6 +39,10 @@ switch ($type) {
   case "userdict":
     if (empty($outfile)) $outfile = 'userdict.json';
     $fields=["_id","word","frequency","locale","appid","shortcut"];
+    break;
+  case "settings":
+    if (empty($outfile)) $outfile = basename($infile,'.lst').'.json';
+    $fields=["_id","name","value"];
     break;
   default     :
     echo "Wrong type '$type'. Valid types are: calls,sms.\n\n";

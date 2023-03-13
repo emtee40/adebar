@@ -22,7 +22,7 @@ As a side-effect, *Adebar* generates a „report“ (or „short documentation�
 * a shell script to disable (freeze) all apps you had disabled/frozen on your device
 * it pulls the `wpa_supplicant.conf` from your device, which holds information on all WiFi APs you've configured (root required) – and also some more configuration files.
 * it pulls the `packages.xml` from your device, which holds all information about apps installed on your device (with Android 4.1 and above, this again requires root)
-* it pulls some data from your device. Currently Call-Logs (root needed), Cell Broadcasts (root needed), UserDictionary (root needed) and SMS, in the future maybe more.
+* it pulls some data from your device. Currently Call-Logs (root needed), Cell Broadcasts (root needed), UserDictionary (root needed), SMS and device settings (global, secure, system), in the future maybe more.
 * a shell script to disable all broadcast receivers (aka "auto-starts") which were disabled on the given device
 * a [HTML][2] file listing all user-installed apps with their sources you've installed them from (e.g. *Google Play*, *F-Droid*, *Aptoide*), date of first install/last update, installed version, and more – plus the same for the (pre-installed) system apps.
 * a [HTML][2] file with some general device documentation.
