@@ -5,6 +5,14 @@
 # © 2014-2023 by Andreas Itzchak Rehberg
 # Licensed using GPLv2 (see the file LICENSE which should have shipped with this)
 
+# --------------------------------=[ Exit Codes ]=--
+ERR_NO_CONFIG_DIR=1
+ERR_NO_DEVICE=2
+ERR_MULTIPLE_DEVICES=3
+ERR_WRONG_DEVICE=4
+ERR_NO_OUTPUT_DIR=5
+ERR_BASH_TOO_OLD=6
+
 # #################################[ Configuration ]###
 # ------------------------=[ directories ]=--
 #OUTDIR='.' # OUTDIR is specified via command line (mandatory parameter)
@@ -73,7 +81,7 @@ if [ x$BASH = x ] || [ ! $BASH_VERSINFO ] || [ $BASH_VERSINFO -lt 4 ]; then
   echo "Sorry, but you need Bash version 4 at least, you currently have version ${BASH_VERSION:-(unknown)}."
   echo "Please update it and relaunch your terminal."
   echo
-  exit 6
+  exit $ERR_BASH_TOO_OLD
 fi
 
 # -------------------=[ UserApp Specials ]=--
@@ -131,7 +139,7 @@ if [[ "$1" = "-a" || "$1" = "--auto" ]]; then
     echo "Sorry, but you can't use automatic config detection with no config directory"
     echo "created. Please create it first, and have your config files placed there."
     echo
-    exit 1
+    exit $ERR_NO_CONFIG_DIR
   fi
   declare -i trc=0
   for serial in $(adb devices|tail -n +2|awk '{print $1}'); do
@@ -160,7 +168,7 @@ elif [[ -z "$1" || "$1" = "-h" || "$1" = "--help" ]]; then
     done
   fi
   echo
-  exit 1
+  exit 0
 else
   OUTDIR="$1"
 fi
@@ -172,7 +180,7 @@ if [ -d "${USER_CONF}" ]; then
   elif [ -f "${USER_CONF}/default" ]; then # default config
     . "${USER_CONF}/default"
   fi
-elif [ -f "${USER_CONF}" ]; then # default config as of v3
+elif [ -f "${USER_CONF}" ]; then # legacy default config
   . "${USER_CONF}"
 fi
 
@@ -196,7 +204,7 @@ if [[ -n "${DUMMY}" ]]; then
     echo "input directory '${DUMMYDIR}' could not be found. Please correct"
     echo "and try again."
     echo
-    exit 2
+    exit $ERR_NO_DEVICE
   fi
   HAVE_AAPT=0       # no app check in dummy mode
   PULL_SETTINGS=0   # nothing to pull from dummies
@@ -214,7 +222,7 @@ if [[ -z "${DUMMYDIR}" ]]; then     # do not check when in dummy mode
     echo "No device found. Make sure you have connected your device with"
     echo "USB debugging enabled, and try again."
     echo
-    exit 2
+    exit $ERR_NO_DEVICE
   fi
 
   serials=($(adb devices|grep -E "^[0-9A-Za-z.:-]+[[:space:]]+device[[:space:]]*$"|awk '{print $1}'))
@@ -225,7 +233,7 @@ if [[ -z "${DUMMYDIR}" ]]; then     # do not check when in dummy mode
     echo "you wish to retrieve data from, or specify its serial in your"
     echo "Configuration. Then try again."
     echo
-    exit 3
+    exit $ERR_MULTIPLE_DEVICES
   fi
 fi
 
@@ -237,7 +245,7 @@ if [ -n "${SERIAL}" ]; then
     echo "Please check if you have the correct device connected, or might have"
     echo "specified the wrong parameter to the script."
     echo ""
-    exit 4
+    exit $ERR_WRONG_DEVICE
   fi
   if [ ${#serials[*]} -gt 1 ]; then
     typeset -i ser=0
@@ -252,7 +260,7 @@ if [ -n "${SERIAL}" ]; then
       echo "Though multiple devices seem to be connected, that is not one"
       echo "of them. Please check and try again."
       echo ""
-      exit 4
+      exit $ERR_WRONG_DEVICE
     fi
   fi
   ADBOPTS="-s ${SERIAL}"
@@ -271,7 +279,7 @@ if [ ! -d "${DOCDIR}" ]; then
   mkdir -p "${DOCDIR}" || {
     echo "Output directory does not exist, and I cannot create it. Sorry."
     echo
-    exit 5
+    exit $ERR_NO_OUTPUT_DIR
   }
   mkdir -p "${CONFDIR}"
   mkdir -p "${DATADIR}"

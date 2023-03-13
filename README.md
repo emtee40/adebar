@@ -1,5 +1,5 @@
 # Adebar
-***Adebar*** stands for <b>A</b>ndroid <b>De</b>vice <b>B</b>ackup <b>a</b>nd <b>R</b>eport. It is mainly based on [Bash](http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29 "Wikipedia: Bash (Unix shell)") and [Adb](http://en.wikipedia.org/wiki/Android_Debug_Bridge "Wikipedia: Android Debug Bridge"). It reportedly works on Linux, Mac and Windows (Cygwin).
+***Adebar*** stands for <b>A</b>ndroid <b>De</b>vice <b>B</b>ackup <b>a</b>nd <b>R</b>eport. It is mainly based on [Bash](https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29 "Wikipedia: Bash (Unix shell)") and [Adb](https://en.wikipedia.org/wiki/Android_Debug_Bridge "Wikipedia: Android Debug Bridge"). It reportedly works on Linux, Mac and Windows (Cygwin).
 
 **Note:** As this is a collection of Shell scripts, you won't find any „binaries“ attached to releases – there are none for *Adebar* and no „compilation“ is required. Please take a look at [the wiki](https://codeberg.org/izzy/Adebar/wiki) for further details and instructions.
 
@@ -15,7 +15,7 @@ As a side-effect, *Adebar* generates a „report“ (or „short documentation�
 ## What kind of backup does *Adebar* create?
 *Adebar* itself does not create any backups. But it generates multiple files, including
 
-* a [shell script](http://en.wikipedia.org/wiki/Shell_script "Wikipedia: Shell script") to create separate ADB (or root) backups for the apps you've installed yourself ("user-apps"), including their `.apk` files and their data
+* a [shell script](https://en.wikipedia.org/wiki/Shell_script "Wikipedia: Shell script") to create separate ADB (or root) backups for the apps you've installed yourself ("user-apps"), including their `.apk` files and their data
 * a shell script to create ADB (or root) backups of system apps, only containing their data, plus shared storage
 * a shell script to create disk images of your device's partitions (for rooted devices)
 * a shell script to download contents of your internal/external SDCards and Backups via Titanium Backup's built-in web server (for rooted devices)
@@ -41,7 +41,7 @@ Optionally, if you have the PHP [CLI](https://en.wikipedia.org/wiki/Command-line
 * `restoreapks`: restore all the APK's you have in a folder via ADB (as retrieved by `getapk`)
 * `mkdummy`: to create a "dummy device" from your real one (mainly intended for debug purposes: if you need assistance, you could zip/tar that after having it sanitized and attach it to an issue, or send it by other means)
 * `root_appbackup.sh`/`root_apprestore.sh`: if you have root powers, these might help you backing up / restoring any app and its data. Use with care!
-* `lst2json.php`: lets you convert the `calllog.lst` and `sms.lst` pulled from your device to JSON, for easier processing with other tools
+* `lst2json.php`: lets you convert the `*.lst` files (from `data/` in your OUTPUT directory) to JSON, for easier processing with other tools
 * `ssnap`: to create a series of screenshots from your device
 
 > **As I cannot test *Adebar* on all existing devices/ROMs, there might be some errors/bugs here and there (specific to a given device, ROM or newer Android version); if you encounter one, please file an issue at [the project's Codeberg presence][1]. General feedback is also more than welcome if you're successfully using *Adebar* with your device, see [List of tested devices](https://codeberg.org/izzy/Adebar/issues/7).**
@@ -58,6 +58,10 @@ Most of them should already be obvious from above description. Nevertheless, all
 
 ## QuickStart
 To get started without too much hazzle, please see `doc/quickstart_config.sample`. Basically, you just copy that file to `config/` (giving it a name of your choice), adjust 4 to 6 settings to reflect your device plus directory structure (as indicated by comments in the file), and you're ready-to-go (i.e. starting `adebar-cli` with the name of your config as only parameter, e.g. `./adebar-cli myandy`).
+
+
+## Exit Codes
+If you're using *Adebar* from within other scripts or e.g. via a Cron job and need to evaluate its exit codes, you can find them defined at the top of `adebar-cli`.
 
 
 ## More details
