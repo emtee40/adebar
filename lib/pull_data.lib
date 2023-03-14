@@ -71,7 +71,7 @@ getUserDict() {
 #
 # Get Settings
 #
-getSettings() {
+getDeviceSettings() {
   [[ $PULL_DATA -ne 1 ]] && return
   doProgress "- Device Settings" 2
 
@@ -92,5 +92,5 @@ getData() {
   getCBC
   getCallLog
   getUserDict
-  getSettings
+  getDeviceSettings
 }
