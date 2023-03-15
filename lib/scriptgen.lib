@@ -423,7 +423,7 @@ getUserAppBackup() {
 getSystemAppBackup() {
   [[ $MK_SYSBACKUP -ne 1 ]] && return
 
-  doProgress "Creating backup/restore scripts for SytemApps"
+  doProgress "Creating backup/restore scripts for SystemApps"
 
   local backupscript="$OUTDIR/sysbackup"
   local restorescript="$OUTDIR/sysrestore"
