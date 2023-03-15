@@ -19,6 +19,7 @@ if ( !isset($argv[2]) ) {
 
 $type = $argv[1];
 $infile = $argv[2];
+$smslist = file_get_contents($infile);
 if ( isset($argv[3]) && !empty($argv[3]) ) $outfile = $argv[3];
 else $outfile = '';
 
@@ -30,7 +31,15 @@ switch ($type) {
   case "cbc"  :
   case "cellbroadcasts":
     if (empty($outfile)) $outfile = 'cellbroadcasts.json';
-    $fields=["_id","geo_scope","plmn","lac","cid","serial_number","service_category","language","body","date","read","format","priority","etws_warning_type","cmas_message_class","cmas_category","cmas_response_type","cmas_severity","cmas_urgency","cmas_certainty"];
+    # _id=
+    # , message_displayed=
+    preg_match_all('/_id=/',$smslist,$matches1);
+    preg_match_all('/, message_displayed=/',$smslist,$matches2);
+    if ( count($matches1[0]) == count($matches2[0]) ) { // Android 11+ replaced date and read by received_time resp. message_displayed
+      $fields=["_id","geo_scope","plmn","lac","cid","serial_number","service_category","language","body","received_time","message_displayed","format","priority","etws_warning_type","cmas_message_class","cmas_category","cmas_response_type","cmas_severity","cmas_urgency","cmas_certainty"];
+    } else {
+      $fields=["_id","geo_scope","plmn","lac","cid","serial_number","service_category","language","body","date","read","format","priority","etws_warning_type","cmas_message_class","cmas_category","cmas_response_type","cmas_severity","cmas_urgency","cmas_certainty"];
+    }
     break;
   case "sms"  :
     if (empty($outfile)) $outfile = 'sms.json';
@@ -53,7 +62,6 @@ $regnames="";
 foreach ($fields as $field) $regnames .= ", ${field}=(?<${field}>.*?)";
 $regnames = substr($regnames,2);
 
-$smslist = file_get_contents($infile);
 preg_match_all("/^Row: \d+ ${regnames}\$/ims", $smslist, $matches);
 $smsarr = [];
 for ($i=0; $i<count($matches[0]);++$i) {

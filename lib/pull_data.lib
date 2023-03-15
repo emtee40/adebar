@@ -40,7 +40,14 @@ getCBC() {
   [[ $HAVE_ROOT -ne 1 ]] && return
   doProgress "- Cell Broadcasts" 2
 
-  local projection="$(_mkProjection geo_scope plmn lac cid serial_number service_category language body date read format priority etws_warning_type cmas_message_class cmas_category cmas_response_type cmas_severity cmas_urgency cmas_certainty)"
+  # projection "date" was replaced by "received_time" and "read" by "message_displayed" with Android 11?
+  local test="$((adb ${ADBOPTS} shell su -c "content query --uri content://cellbroadcasts --projection date") 2>&1)"
+  if [[ ${test} = *"SQLiteException"* ]]; then
+    local projection="$(_mkProjection geo_scope plmn lac cid serial_number service_category language body received_time message_displayed format priority etws_warning_type cmas_message_class cmas_category cmas_response_type cmas_severity cmas_urgency cmas_certainty)"
+  else
+    local projection="$(_mkProjection geo_scope plmn lac cid serial_number service_category language body date read format priority etws_warning_type cmas_message_class cmas_category cmas_response_type cmas_severity cmas_urgency cmas_certainty)"
+  fi
+
   adb ${ADBOPTS} shell su -c "content query --uri content://cellbroadcasts --projection ${projection}" > ${DATADIR}/cellbroadcasts.lst
 }
 
