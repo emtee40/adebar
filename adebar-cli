@@ -10,7 +10,7 @@ ERR_NO_CONFIG_DIR=1
 ERR_NO_DEVICE=2
 ERR_MULTIPLE_DEVICES=3
 ERR_WRONG_DEVICE=4
-ERR_NO_OUTPUT_DIR=5
+ERR_MISSING_DIR=5
 ERR_BASH_TOO_OLD=6
 
 # #################################[ Configuration ]###
@@ -275,15 +275,15 @@ CONFDIR="${OUTDIR}/${CONFDIR}"
 DATADIR="${OUTDIR}/${DATADIR}"
 PKGXML="${CONFDIR}/packages.xml"
 BUILDPROP="${CONFDIR}/build.prop"
-if [ ! -d "${DOCDIR}" ]; then
-  mkdir -p "${DOCDIR}" || {
-    echo "Output directory does not exist, and I cannot create it. Sorry."
-    echo
-    exit $ERR_NO_OUTPUT_DIR
-  }
-  mkdir -p "${CONFDIR}"
-  mkdir -p "${DATADIR}"
-fi
+for dir in ${OUTDIR} ${DOCDIR} ${CONFDIR} ${DATADIR}; do
+  if [ ! -d "${dir}" ]; then
+    mkdir -p "${dir}" || {
+      echo "Directory ${dir} does not exist, and I cannot create it. Sorry."
+      echo
+      exit $ERR_MISSING_DIR
+    }
+  fi
+done
 
 # What Android version shall we assume (for specific features)? Do not evaluate if user has configured an override.
 [[ -z "${DEVICE_SDKVER}" ]] && {
