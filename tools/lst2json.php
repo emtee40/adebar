@@ -34,7 +34,7 @@ switch ($type) {
     break;
   case "sms"  :
     if (empty($outfile)) $outfile = 'sms.json';
-    $fields=["_id","thread_id","address","person","date","date_sent","protocol","read","status","type","reply_path_present","subject","body","service_center","locked","sub_id","error_code","creator","seen","priority"];
+    $fields=["_id","thread_id","address","person","date","date_sent","protocol","read","status","type","reply_path_present","subject","body","service_center","locked","sub_id","error_code","creator","seen"];
     break;
   case "userdict":
     if (empty($outfile)) $outfile = 'userdict.json';

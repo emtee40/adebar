@@ -52,7 +52,7 @@ getSMS() {
   [ $PULL_DATA -ne 1 ] && return
   doProgress "- SMS" 2
 
-  local projection=$(_mkProjection thread_id address person date date_sent protocol read status type reply_path_present subject body service_center locked sub_id error_code creator seen priority)
+  local projection=$(_mkProjection thread_id address person date date_sent protocol read status type reply_path_present subject body service_center locked sub_id error_code creator seen)
   adb ${ADBOPTS} shell "content query --uri content://sms/ --projection ${projection}" > ${DATADIR}/sms.lst
 }
 
