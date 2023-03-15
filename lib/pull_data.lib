@@ -83,9 +83,9 @@ getDeviceSettings() {
   doProgress "- Device Settings" 2
 
   local projection="$(_mkProjection name value)"
-  adb ${ADBOPTS} shell su -c "content query --uri content://settings/global --projection ${projection}" > ${DATADIR}/settings_global.lst
-  adb ${ADBOPTS} shell su -c "content query --uri content://settings/secure --projection ${projection}" > ${DATADIR}/settings_secure.lst
-  adb ${ADBOPTS} shell su -c "content query --uri content://settings/system --projection ${projection}" > ${DATADIR}/settings_system.lst
+  adb ${ADBOPTS} shell "content query --uri content://settings/global --projection ${projection}" > ${DATADIR}/settings_global.lst
+  adb ${ADBOPTS} shell "content query --uri content://settings/secure --projection ${projection}" > ${DATADIR}/settings_secure.lst
+  adb ${ADBOPTS} shell "content query --uri content://settings/system --projection ${projection}" > ${DATADIR}/settings_system.lst
 }
 
 
