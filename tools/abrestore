@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Fixing 'adb restore' for devices with Android 7 (Nougat) and above
 # Some of them don't restore a backup if the app itself isn't yet installed
 # This script works around that by extracting and installing the APK

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # restoring an app backup obtained by root_appbackup.sh using root powers
 #
 # !!! WARNING !!!

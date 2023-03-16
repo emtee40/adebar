@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Create a dummy device based on data from a real connected device
 # Pass the name of the device as parameter and make sure you only have a single
 # device connected (the one you want to "clone")

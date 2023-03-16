@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # obtaining a backup of any app using "root powers"
 
 ERROR_SYNTAX=1

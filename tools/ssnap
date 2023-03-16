@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Screenshot Snapper alias "Serial Snapper"
 # collect screenshots from an app in demo mode, hiding your real notifications
 # and setting the clock to a "fake time" (of course reverting to normal

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Restore all apk's in current folder, including
 # multi-apk apps which have their many apks in
 # their respective folders, as pulled from your phone
