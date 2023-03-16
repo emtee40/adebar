@@ -1,5 +1,5 @@
 ##############################################################################
-# Adebar © 2014-2020 by Itzchak Rehberg
+# Adebar © 2014-2023 by Itzchak Rehberg
 # This is part of the Adebar project, see https://codeberg.org/izzy/Adebar
 # Protected by the GPLv2
 # ----------------------------------------------------------------------------
@@ -104,6 +104,16 @@ ansi_code() {
   echo "${txt}\033[0m"
 }
 
+
+#
+# -----------------------------------------=[ error messages and warnings ]=--
+#
+log_error() {
+  echo -e "$(ansi_code "${1}" "red")"
+}
+log_warning() {
+  echo -e "$(ansi_code "${1}" "yellow")"
+}
 
 #
 # ---------------------------------=[ Format file sizes to human-readible ]=--

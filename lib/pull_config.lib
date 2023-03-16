@@ -1,5 +1,5 @@
 ##############################################################################
-# Adebar © 2014-2022 by Itzchak Rehberg
+# Adebar © 2014-2023 by Itzchak Rehberg
 # This is part of the Adebar project, see https://codeberg.org/izzy/Adebar
 # Protected by the GPLv2
 # ----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ getXPrivacy() {
       adb ${ADBOPTS} shell rm ${filename}
       [[ -f "${CONFDIR}/xprivacy.xml" ]] && gzip -9 "${CONFDIR}/xprivacy.xml"
     else
-      echo -e "$(ansi_code "failed to pull export from XPrivacy. Are you sure you're running its PRO version?" "red")"
+      log_error "failed to pull export from XPrivacy. Are you sure you're running its PRO version?"
     fi
   }
 
@@ -160,7 +160,7 @@ getXPrivacy() {
         local tmpdir="/sdcard/xprivacy_$(date +"%Y%m%d_%H%M%S")"
         local msg="$((adb ${ADBOPTS} shell "su -c \"cp -a /data/system/xprivacy $tmpdir\"") 2>&1)"
         if [[ "$msg" =~ "Permission denied" ]]; then
-          echo -e "$(ansi_code "$msg" "red")"
+          log_error "$msg"
         else # empty = OK (so maybe we need another check here)
           msg="$((adb ${ADBOPTS} pull $tmpdir "${CONFDIR}/xprivacy_dbs") 2>&1)" # if OK, starts with "pull: building file list..."
         fi
