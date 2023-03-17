@@ -125,6 +125,7 @@ declare -A OOPSES    # array to store which lines where already reported
 ############################################[ Init ]###
 BINDIR="$(dirname "$(readlink -mn "${0}")")" #"
 LIBDIR="${BINDIR}/lib"
+. "${LIBDIR}/common.lib"
 
 # get user config if exist
 USER_CONF="$HOME/.config/adebar"
@@ -270,6 +271,7 @@ fi
 if [ -n "${STORAGE_BASE}" ]; then
   OUTDIR="${STORAGE_BASE}/${OUTDIR}"
 fi
+# Check/SetUp other directories we need
 DOCDIR="${OUTDIR}/${DOCDIR}"
 CONFDIR="${OUTDIR}/${CONFDIR}"
 DATADIR="${OUTDIR}/${DATADIR}"
@@ -278,12 +280,16 @@ BUILDPROP="${CONFDIR}/build.prop"
 for dir in ${OUTDIR} ${DOCDIR} ${CONFDIR} ${DATADIR}; do
   if [ ! -d "${dir}" ]; then
     mkdir -p "${dir}" || {
-      echo "Directory ${dir} does not exist, and I cannot create it. Sorry."
+      log_error "Directory ${dir} does not exist, and I cannot create it. Sorry."
       echo
       exit $ERR_MISSING_DIR
     }
   fi
 done
+if [[ -n "${CACHEDIR}" && ! -d "${CACHEDIR}" ]]; then
+  log_warning "CACHEDIR was defined as '${CACHEDIR}' but this does not exist. Caching turned off."
+  CACHEDIR=""
+fi
 
 # What Android version shall we assume (for specific features)? Do not evaluate if user has configured an override.
 [[ -z "${DEVICE_SDKVER}" ]] && {
@@ -301,7 +307,6 @@ DEVICE_SDKVER=${DEVICE_SDKVER//[$'\t\r\n']}
 }
 
 # Load libraries if needed
-. "${LIBDIR}/common.lib"
 . "${LIBDIR}/dummydevs.lib"
 [[ $((${MK_PARTINFO} + ${MK_PARTBACKUP})) -gt 0 ]] && . "${LIBDIR}/partitions.lib"
 [[ $(($PULL_SETTINGS + $MK_XPRIVACY_EXPORT + $MK_XPRIVACY_PULL)) -gt 0 ]] && . "${LIBDIR}/pull_config.lib"
@@ -432,7 +437,7 @@ postProcess() {
               rm -rf "${GENS[${counter}]:0:12}"
             else
               warning="  + '${GENS[${counter}]:0:12}' seems to contain backups. Renaming it to '${GENS[${counter}]:0:12}.Backup'"
-              echo -e "$(ansi_code "$warning" "red")"
+              log_warning "$warning"
               mv "${GENS[${counter}]:0:12}" "${GENS[${counter}]:0:12}.Backup"
             fi
             unset GENS[${counter}]
