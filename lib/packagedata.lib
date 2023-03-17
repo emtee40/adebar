@@ -52,7 +52,7 @@ getAppname() {
     local str="$(adb ${ADBOPTS} shell "aapt d badging $2 2>/dev/null" | grep 'application: label' | sed -n "s/.*label\='\([^']*\)'.*/\1/p")" # label='Some App''
     str=${str//[$'\t\r\n']} # stupid ^M
     if [[ -n "${str}" ]]; then
-      [[ -n "${CACHEDIR}" && -e "${CACHEDIR}" && ! -f "${CACHEDIR}/$1" ]] && echo -n $str > "${CACHEDIR}/$1"
+      [[ -n "${CACHEDIR}" && ! -f "${CACHEDIR}/$1" ]] && echo -n $str > "${CACHEDIR}/$1"
       echo "${str}"
       return
     fi
@@ -61,7 +61,7 @@ getAppname() {
   # not found in cache nor by AAPT: optionally call user script/function here (if defined)
   if [[ ${3} -gt 0 && -n "${APPNAME_CMD}" ]]; then
     name="$(${APPNAME_CMD} $1)"
-    if [[ "${name}" != "$1" ]]; then
+    if [[ -n "${CACHEDIR}" && ! -f "${CACHEDIR}/$1" && "${name}" != "$1" ]]; then
       echo "${name}" > "${CACHEDIR}/$1"
     fi
     echo "${name}"
