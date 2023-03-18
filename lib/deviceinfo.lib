@@ -93,7 +93,7 @@ getDeviceInfo() {
   echo "$(heading 2 'Device and ROM properties' 'devprops')" >> "$devicedoc"
   echo "  <li>$(href '#devprops' 'Properties')</li>" >> "$devicehead"
   #-------------------------------------------------------=[ Product Info ]=---
-  doProgress "   + checking for product details" 3
+  doProgress "  + Checking for product details" 3
   echo "$(tab_classopen 'block' 'tab_prodinfo')" >> "$devicedoc"
   echo "$(trth2 'Product Info')" >> "$devicedoc"
   echo "$(trthtd 'Manufacturer' "${DEVPROP[ro.product.manufacturer]}")" >> "$devicedoc"                   # ro.product.manufacturer=Motorola
@@ -141,7 +141,7 @@ getDeviceInfo() {
 
   #------------------------------------------------------------=[ Sensors ]=---
   if [[ ${MK_DEVICEINFO_SENSORS} -gt 0 ]]; then
-    doProgress "   + checking for sensor details" 3
+    doProgress "  + Checking for sensor details" 3
     copyAdbContent dumpsys_sensorservice "adb ${ADBOPTS} shell dumpsys sensorservice 2>/dev/null" "${tmp}"
     if [[ $(cat "${tmp}" | wc -l) -gt 1 ]]; then # make sure sensorservice is available
       echo "$(tab_classopen 'block' 'tab_sensors')" >> "$devicedoc"
@@ -177,7 +177,7 @@ getDeviceInfo() {
   fi
 
   #---------------------------------------------------------=[ OS Details ]=---
-  doProgress "   + checking for OS details" 3
+  doProgress "  + Checking for OS details" 3
   echo "$(tab_classopen 'block' 'tab_osdetails')" >> "$devicedoc"
   echo "$(trth2 'OS details')" >> "$devicedoc"
   echo "$(trthtd 'SDK/Android version' "${DEVPROP[ro.build.version.sdk]}/${DEVPROP[ro.build.version.release]}")" >> "$devicedoc" # 16/4.1.2
@@ -197,7 +197,7 @@ getDeviceInfo() {
   echo >> "$devicedoc"
 
   #-----------------------------------------------------=[ Memory Details ]=---
-  doProgress "   + checking for Memory details" 3
+  doProgress "  + Checking for memory details" 3
   copyAdbContent proc_meminfo "adb ${ADBOPTS} shell cat /proc/meminfo 2>/dev/null" "${tmp}"
   if [[ $(cat "${tmp}" | wc -l) -gt 1 ]]; then # make sure details are available
     echo "$(tab_classopen 'block' 'tab_memdetails')" >> "$devicedoc"
@@ -347,7 +347,7 @@ getDeviceInfo() {
   fi
 
   #-------------------------------------------------=[ Networking details ]=---
-  doProgress "  + networking details" 3
+  doProgress "  + Networking details" 3
   echo "$(tab_classopen 'block' 'tab_networkdetails')" >> "$devicedoc"
   echo "$(trth2 'Networking details')" >> "$devicedoc"
   if [[ -n "${DEVPROP[net.hostname]}" ]]; then
@@ -374,7 +374,7 @@ getDeviceInfo() {
   echo >> "$devicedoc"
 
   #------------------------------------------------------------=[ Storage ]=---
-  doProgress "  + storage details" 3
+  doProgress "  + Storage details" 3
   echo "$(tab_classopen 'block' 'tab_storagedetails')" >> "$devicedoc"
   echo "$(trth2 "Storage details <sup><b>$(href "${WIKI_BASE}/DeviceInfo-explained#user-content-storage-details" 'ⓘ' 'Wiki')</b></sup>")" >> "$devicedoc"
   [[ -n "${DEVPROP[EXTERNAL_STORAGE_MOUNT]}" ]] && echo "$(trthtd 'Internal SD mount point' "${DEVPROP[EXTERNAL_STORAGE_MOUNT]}")" >> "$devicedoc"
@@ -433,7 +433,7 @@ getDeviceInfo() {
 
 
   #---------------------------------------------------------------=[ Misc ]=---
-  doProgress "  + misc details" 3
+  doProgress "  + Misc details" 3
   echo "$(tab_classopen 'block' 'tab_miscdetails')" >> "$devicedoc"
   echo "$(trth2 'Miscellaneous')" >> "$devicedoc"
   [[ -n "${DEVPROP[keyguard.no_require_sim]}" ]] && {

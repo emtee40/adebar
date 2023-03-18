@@ -189,7 +189,7 @@ RETRY41() {
 getUserAppBackup() {
   [[ $MK_USERBACKUP -ne 1 ]] && return
 
-  doProgress "Creating backup/restore scripts for UserApps"
+  doProgress "Creating backup/restore scripts for userApps"
 
   local backupscript="$OUTDIR/userbackup"
   local restorescript="$OUTDIR/userrestore"
@@ -423,7 +423,7 @@ getUserAppBackup() {
 getSystemAppBackup() {
   [[ $MK_SYSBACKUP -ne 1 ]] && return
 
-  doProgress "Creating backup/restore scripts for SystemApps"
+  doProgress "Creating backup/restore scripts for systemApps"
 
   local backupscript="$OUTDIR/sysbackup"
   local restorescript="$OUTDIR/sysrestore"

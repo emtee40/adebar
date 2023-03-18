@@ -353,7 +353,7 @@ initAppLists() {
     fi
   done
 
-  doProgress "- disabled apps" 2    # disabled only; they are also included with "list [-s]"; in package data they have enabled=3 for the user
+  doProgress "- Disabled apps" 2    # disabled only; they are also included with "list [-s]"; in package data they have enabled=3 for the user
   apps=$(getAdbContent pm_list_packages_d "adb ${ADBOPTS} shell pm list packages -d 2>/dev/null")
   for app in $apps; do
     if [[ "${app}" =~ ^package: ]]; then
@@ -378,7 +378,7 @@ initAppLists() {
   done
 
   # uninstalled is obviously per-user ("pm uninstall --user 0 <packageName>")
-  doProgress "- uninstalled apps" 2 # installed=false enabled=0 for the given user in package data
+  doProgress "- Uninstalled apps" 2 # installed=false enabled=0 for the given user in package data
   apps=$(getAdbContent pm_list_packages_u "adb ${ADBOPTS} shell pm list packages -u 2>/dev/null")
   for app in $apps; do
     if [[ "${app}" =~ ^package: ]]; then
@@ -397,10 +397,10 @@ initAppLists() {
 # Post processing
 #
 postProcess() {
-  doProgress "PostProcessing and Cleanup"
+  doProgress "PostProcessing and cleanup"
   if [[ $TIMESTAMPED_SUBDIRS -gt 0 ]]; then
     if [[ $LINK_LATEST_SUBDIR -gt 0 ]]; then
-      doProgress "- symlink latest generation" 2
+      doProgress "- Symlink latest generation" 2
       local LINK_NAME="$(dirname "${OUTDIR}")/latest"
       if [ -L "${LINK_NAME}" -o ! -e "${LINK_NAME}" ]; then
         rm -f "${LINK_NAME}" > /dev/null 2>&1
@@ -410,7 +410,7 @@ postProcess() {
       fi
 
       if [[ ${KEEP_SUBDIR_GENERATIONS} -gt 0 ]]; then
-        doProgress "- remove outaged generations" 2
+        doProgress "- Remove outaged generations" 2
         declare -a GENS
         cd "$(dirname ${OUTDIR})"
         for d in $(ls -dpX [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]); do
@@ -433,7 +433,7 @@ postProcess() {
             files=(${GENS[${counter}]:0:12}/*.gz)         # Any .gz archives, e.g. converted by ab2tar
             [[ -e "${files[0]}" ]] && HAVE_BACKUPS=1
             if [[ $HAVE_BACKUPS -eq 0 ]]; then
-              doProgress "  + removing '${GENS[${counter}]:0:12}'" 3
+              doProgress "  + Removing '${GENS[${counter}]:0:12}'" 3
               rm -rf "${GENS[${counter}]:0:12}"
             else
               warning="  + '${GENS[${counter}]:0:12}' seems to contain backups. Renaming it to '${GENS[${counter}]:0:12}.Backup'"
@@ -450,7 +450,7 @@ postProcess() {
   fi
 
   if [[ -n "${POSTRUN_CMD}" ]]; then
-    doProgress "- executing post-run command" 2
+    doProgress "- Executing post-run command" 2
     $(${POSTRUN_CMD})
   fi
 }

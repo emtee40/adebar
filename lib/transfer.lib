@@ -34,7 +34,7 @@ installApk() {
     oops "installApk" "${LINENO}" "no directory for ${1} found, skipping." 4
     return
   fi
-  doProgress "- checking for packages to ${1}" 2
+  doProgress "- Checking for packages to ${1}" 2
   for apk in ${instDir}/*.apk; do
     [[ "$apk" = "${instDir}/*.apk" ]] && continue # mask only means no files
     msg="$((adb ${ADBOPTS} install ${instOpts} "$apk") 2>&1)"
@@ -70,7 +70,7 @@ pushFiles() {
     oops "pushFiles" "${LINENO}" "upload directory '${src}' does not exist, skipping." 4
     return
   fi
-  doProgress "- checking for files to push to the device" 2
+  doProgress "- Checking for files to push to the device" 2
   for name in $src/*; do
     [[ "$name" = "$src/*" ]] && continue # mask only means no files
     msg="$((adb ${ADBOPTS} push $name $(basename $name)) 2>&1)"
@@ -97,13 +97,13 @@ specialTrans() {
     log_error "specialTrans called without TRANSFER_DIR being set"
     return
   fi
-  doProgress "- checking special transfer directory" 2
+  doProgress "- Checking special transfer directory" 2
   [[ ! -d "${TRANSFER_DIR}/special" || ! -f "${TRANSFER_DIR}/special/run" ]] && return    # nothing to do
   [[ ! -x "${TRANSFER_DIR}/special/run" ]] && {
-    doProgress "! found '${TRANSFER_DIR}/special/run', but it's not executable. Skipping." 2
+    doProgress "! Found '${TRANSFER_DIR}/special/run', but it's not executable. Skipping." 2
     return
   }
-  doProgress "  + executing '${TRANSFER_DIR}/special/run'" 3
+  doProgress "  + Executing '${TRANSFER_DIR}/special/run'" 3
   ${TRANSFER_DIR}/special/run
   local rc=$?
   if [[ $rc -eq 0 ]]; then
@@ -126,7 +126,7 @@ doTransfer() {
     oops "doTransfer" "${LINENO}" "doTransfer() called without TRANSFER_DIR being set" 4
     return
   fi
-  doProgress "Dealing with Transfers"
+  doProgress "Dealing with transfers"
   if [[ ! -d "${TRANSFER_DIR}" ]]; then
     oops "doTransfer" "${LINENO}" "- TRANSFER_DIR '${TRANSFER_DIR}' does not exist, skipping transfers." 2
     return

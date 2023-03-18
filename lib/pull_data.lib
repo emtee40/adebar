@@ -38,7 +38,7 @@ getCallLog() {
 getCBC() {
   [[ $PULL_DATA -ne 1 ]] && return
   [[ $HAVE_ROOT -ne 1 ]] && return
-  doProgress "- Cell Broadcasts" 2
+  doProgress "- Cell broadcasts" 2
 
   # projection "date" was replaced by "received_time" and "read" by "message_displayed" with Android 11?
   local test="$((adb ${ADBOPTS} shell su -c "content query --uri content://cellbroadcasts --projection date") 2>&1)"
@@ -69,7 +69,7 @@ getSMS() {
 getUserDict() {
   [[ $PULL_DATA -ne 1 ]] && return
   [[ $HAVE_ROOT -ne 1 ]] && return
-  doProgress "- User Dictionary" 2
+  doProgress "- User dictionary" 2
 
   local projection="$(_mkProjection word frequency locale appid shortcut)"
   adb ${ADBOPTS} shell su -c "content query --uri content://user_dictionary/words --projection ${projection}" > ${DATADIR}/userdict.lst
@@ -80,7 +80,7 @@ getUserDict() {
 #
 getDeviceSettings() {
   [[ $PULL_DATA -ne 1 ]] && return
-  doProgress "- Device Settings" 2
+  doProgress "- Device settings" 2
 
   local projection="$(_mkProjection name value)"
   adb ${ADBOPTS} shell "content query --uri content://settings/global --projection ${projection}" > ${DATADIR}/settings_global.lst
@@ -94,7 +94,7 @@ getDeviceSettings() {
 #
 getData() {
   [ $PULL_DATA -ne 1 ] && return
-  doProgress "Pulling Data"
+  doProgress "Pulling data"
   getSMS
   getCBC
   getCallLog

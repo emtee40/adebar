@@ -103,7 +103,7 @@ parse_dom_u4stat () {
 # Now for the real thing
 getAppUsage() {
   [[ ! -f "${CONFDIR}/usage-history.xml" ]] && return
-  doProgress "- collecting app usage stats" 2
+  doProgress "- Collecting app usage stats" 2
   currpkg=
   while read_dom; do
     parse_dom_u4stat
@@ -124,7 +124,7 @@ declare -A PK_ASIZE
 declare -A PK_CSIZE
 declare -A PK_DSIZE
 getAppStorageStats() {
-  doProgress "- collecting app storage details" 2
+  doProgress "- Collecting app storage details" 2
   DSTATS=$(getAdbContent dumpsys_diskstats "adb ${ADBOPTS} shell dumpsys diskstats")
   re='Package Names: \[([^]]*)\]'
   if [[ $DSTATS =~ $re ]]; then
@@ -188,12 +188,12 @@ getAppDetails() {
   local SH_DISABLED="${OUTDIR}/deadReceivers.sh"
 
   doProgress "Generating app detail info"
-  doProgress "- collecting data via dumpsys" 2
+  doProgress "- Collecting data via dumpsys" 2
   copyAdbContent dumpsys_package "adb ${ADBOPTS} shell dumpsys package" $tmp
   grep -E -A99999 "^Packages:" $tmp | grep -iE -B99999 "^Shared users:" > "${PKGDUMP}"
 
   # Parsing dump
-  doProgress "- parsing package dump" 2
+  doProgress "- Parsing package dump" 2
   while IFS='' read zeile; do # no idea why, but some dump lines are terminated using CRLF
     zeile="${zeile%"${zeile##*[![:space:]]}"}" #" rtrim (e.g. S7 Edge otherwise causes trouble)
     case ${P_BLOCK} in
@@ -232,7 +232,7 @@ getAppDetails() {
         case "$tmpstring" in
           "codePath")
             PK_CODEPATH[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +codePath: ${PK_CODEPATH[$P_PKGNAME]}" 5
+            doProgress "    + codePath: ${PK_CODEPATH[$P_PKGNAME]}" 5
             continue
             ;;
           "versionCode")
@@ -247,42 +247,42 @@ getAppDetails() {
             if [[ $zeile =~ $re ]]; then
               PK_TARGETSDK[$P_PKGNAME]=${BASH_REMATCH[1]}
             fi
-            doProgress "    +versionCode: ${PK_VERSIONCODE[$P_PKGNAME]}, minSdk: ${PK_MINSDK[$P_PKGNAME]}, targetSdk: ${PK_TARGETSDK[$P_PKGNAME]}" 5
+            doProgress "    + versionCode: ${PK_VERSIONCODE[$P_PKGNAME]}, minSdk: ${PK_MINSDK[$P_PKGNAME]}, targetSdk: ${PK_TARGETSDK[$P_PKGNAME]}" 5
             continue
             ;;
           "versionName")
             PK_VERSION[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +version: ${PK_VERSION[$P_PKGNAME]}" 5
+            doProgress "    + version: ${PK_VERSION[$P_PKGNAME]}" 5
             continue
             ;;
           "apkSigningVersion")
             PK_SIGNINGVER[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +signingVersion: ${PK_SIGNINGVER[$P_PKGNAME]}" 5
+            doProgress "    + signingVersion: ${PK_SIGNINGVER[$P_PKGNAME]}" 5
             continue
             ;;
           "userId")
             PK_IDS[$P_PKGNAME]="$(trim "${zeile}")"
-            doProgress "    +IDs: ${PK_IDS[$P_PKGNAME]}" 5
+            doProgress "    + IDs: ${PK_IDS[$P_PKGNAME]}" 5
             continue
             ;;
           "dataDir")
             PK_DATADIR[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +data: ${PK_DATADIR[$P_PKGNAME]}" 5
+            doProgress "    + data: ${PK_DATADIR[$P_PKGNAME]}" 5
             continue
             ;;
           "supportsScreens")
             PK_SCREENSIZE[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +screens: ${PK_SCREENSIZE[$P_PKGNAME]}" 5
+            doProgress "    + screens: ${PK_SCREENSIZE[$P_PKGNAME]}" 5
             continue
             ;;
           "firstInstallTime")
             PK_FIRSTINSTALL[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +firstinst: ${PK_FIRSTINSTALL[$P_PKGNAME]}" 5
+            doProgress "    + firstinst: ${PK_FIRSTINSTALL[$P_PKGNAME]}" 5
             continue
             ;;
           "lastUpdateTime")
             PK_LASTUPDATE[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +lastup: ${PK_LASTUPDATE[$P_PKGNAME]}" 5
+            doProgress "    + lastup: ${PK_LASTUPDATE[$P_PKGNAME]}" 5
             continue
             ;;
           "installerPackageName")
@@ -294,23 +294,23 @@ getAppDetails() {
               fi
             }
             PK_INSTALLER[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +installer: ${PK_INSTALLER[$P_PKGNAME]}" 5
+            doProgress "    + installer: ${PK_INSTALLER[$P_PKGNAME]}" 5
             continue
             ;;
           "flags")
             PK_FLAGS[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +flags: ${PK_FLAGS[$P_PKGNAME]}" 5
+            doProgress "    + flags: ${PK_FLAGS[$P_PKGNAME]}" 5
             continue
             ;;
           "privateFlags")
             PK_PRIVFLAGS[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +privFlags: ${PK_PRIVFLAGS[$P_PKGNAME]}" 5
+            doProgress "    + privFlags: ${PK_PRIVFLAGS[$P_PKGNAME]}" 5
             continue
             ;;
           "mtkFlags")
             # MTK devices only. Until now, we only know about the "OPERATOR" flag. No details what it is about.
             PK_MTKFLAGS[$P_PKGNAME]="${zeile##*=}"
-            doProgress "    +flags: ${PK_MTKFLAGS[$P_PKGNAME]}" 5
+            doProgress "    + flags: ${PK_MTKFLAGS[$P_PKGNAME]}" 5
             continue
             ;;
           *)
@@ -323,13 +323,13 @@ getAppDetails() {
             regex='^\s+disabledComponents:'
             if [[ "${zeile}" =~ $regex ]]; then
               P_BLOCK="disabled"
-              doProgress "    +disabledComponents" 5
+              doProgress "    + disabledComponents" 5
               continue
             fi
             regex='^\s+enabledComponents:'
             if [[ "${zeile}" =~ $regex ]]; then
               P_BLOCK="enabled"
-              doProgress "    +enabledComponents" 5
+              doProgress "    + enabledComponents" 5
               continue
             fi
             if [[ "${zeile:0:8}" = "    User" ]]; then  # Android 4.2+ MultiUser info
@@ -343,27 +343,27 @@ getAppDetails() {
             fi
             if [[ "${zeile:0:17}" == "    primaryCpuAbi" ]]; then # primaryCpuAbi=armeabi-v7a
               PK_PRIMARYCPU[$P_PKGNAME]="${zeile:18}"
-              doProgress "    +primaryCpuAbi: ${PK_PRIMARYCPU[$P_PKGNAME]}" 5
+              doProgress "    + primaryCpuAbi: ${PK_PRIMARYCPU[$P_PKGNAME]}" 5
               continue
             fi
             if [[ "${zeile:0:19}" == "    secondaryCpuAbi" ]]; then # secondaryCpuAbi=null
               PK_SECONDARYCPU[$P_PKGNAME]="${zeile:20}"
-              doProgress "    +secondaryCpuAbi: ${PK_SECONDARYCPU[$P_PKGNAME]}" 5
+              doProgress "    + secondaryCpuAbi: ${PK_SECONDARYCPU[$P_PKGNAME]}" 5
               continue
             fi
             if [[ "${zeile:0:15}" == "    appCategory" ]]; then
               PK_APPCATEGORY[$P_PKGNAME]="${appCategory[${zeile:16}]}"
-              doProgress "    +appCategory: ${PK_APPCATEGORY[$P_PKGNAME]}" 5
+              doProgress "    + appCategory: ${PK_APPCATEGORY[$P_PKGNAME]}" 5
               continue
             fi
             if [[ "${zeile:0:18}" == "    queriesIntents" ]]; then
               PK_QUERIESINTENTS[$P_PKGNAME]="${zeile:19}"
-              doProgress "    +appQueriesIntents: ${PK_QUERIESINTENTS[$P_PKGNAME]}" 5
+              doProgress "    + appQueriesIntents: ${PK_QUERIESINTENTS[$P_PKGNAME]}" 5
               continue
             fi
             if [[ "${zeile:0:36}" == "    hasPreserveLegacyExternalStorage" ]]; then
               PK_LEGACYSTORAGE[$P_PKGNAME]="${zeile:37}"
-              doProgress "    +legacyStorage: ${PK_LEGACYSTORAGE[$P_PKGNAME]}" 5
+              doProgress "    + legacyStorage: ${PK_LEGACYSTORAGE[$P_PKGNAME]}" 5
               continue
             fi
             # silently skip some stuff:
@@ -388,7 +388,7 @@ getAppDetails() {
         regex='^\s+enabledComponents:'
         if [[ "${zeile}" =~ $regex ]]; then
           P_BLOCK="enabled"
-          doProgress "    +enabledComponents" 5
+          doProgress "    + enabledComponents" 5
           continue
         fi
         if [[ "${zeile:0:6}" = "      " ]]; then
@@ -401,7 +401,7 @@ getAppDetails() {
         fi
         if [[ "${zeile}" = "    grantedPermissions:" ]]; then
           P_BLOCK="perms"
-              doProgress "    +perms" 5
+              doProgress "    + perms" 5
           continue
         fi
         if [[ "${zeile:0:11}" = "  Package [" ]]; then  # "  Package [com.google.android.location] (40e85638):"
@@ -439,7 +439,7 @@ getAppDetails() {
         fi
         if [[ "${zeile}" = "    grantedPermissions:" ]]; then
           P_BLOCK="perms"
-          doProgress "    +perms" 5
+          doProgress "    + perms" 5
           continue
         fi
         if [[ "${zeile:0:11}" = "  Package [" ]]; then  # "  Package [com.google.android.location] (40e85638):"
@@ -492,7 +492,7 @@ getAppDetails() {
   [[ ${MK_DEFAULTAPPS} -ne 0 ]] && _makeDefaultAppDoc   # calling this last so userApps/sysApps can take care for app name retrieval
   [[ $((${MK_USERAPPS} + ${MK_SYSAPPS} + ${MK_UNINSTAPPS})) -ne 0 ]] && echo " </ul></li></ul>" >> "${DOCDIR}/apps.head"
 
-  doProgress "- removing temporary dumpfile" 2
+  doProgress "- Removing temporary dumpfile" 2
   rm -f "${PKGDUMP}" "$tmp"
 }
 
@@ -502,7 +502,7 @@ getAppDetails() {
 # (called from getAppDetails())
 #
 function _makeDefaultAppDoc() {
-  doProgress "- generating defaultApps.md" 2
+  doProgress "- Generating defaultApps.md" 2
   local mdfile="${DOCDIR}/defaultApps.md"
   echo -e "$(heading 2 "Default Apps on ${DEVICE_NAME}" "defaultApps")\n" > "${mdfile}"
   _makeWebviewDetails
@@ -516,7 +516,7 @@ function _makeDefaultAppDoc() {
 #
 function _mkStandardApps() {
   [[ -n "${DUMMYDIR}" ]] && {
-    doProgress "! skipping StandardApps for dummy device"
+    doProgress "! Skipping StandardApps for dummy device"
     return
   }
 
@@ -699,7 +699,7 @@ function _makeAppDoc() {
   local applist
   case "${1,,}" in
     "user")
-        doProgress "- generating userApps.md" 2
+        doProgress "- Generating userApps.md" 2
         mdfile="${DOCDIR}/userApps.md"
         apptype="User-Apps"
         applist=(${userApps[*]})
@@ -707,7 +707,7 @@ function _makeAppDoc() {
         _retrieveAppNames=1
         ;;
     "system")
-        doProgress "- generating sysApps.md" 2
+        doProgress "- Generating sysApps.md" 2
         mdfile="${DOCDIR}/sysApps.md"
         apptype="System-Apps"
         applist=(${sysApps[*]})
@@ -715,14 +715,14 @@ function _makeAppDoc() {
         _retrieveAppNames=${MK_SYSAPPS_RETRIEVE_NAMES}
         ;;
     "disabled")
-        doProgress "- generating disApps.md" 2
+        doProgress "- Generating disApps.md" 2
         mdfile="${DOCDIR}/disApps.md"
         apptype="Disabled Apps"
         applist=(${disApps[*]})
         _retrieveAppNames=${MK_SYSAPPS_RETRIEVE_NAMES}
         ;;
     "uninst")
-        doProgress "- generating uninstApps.md" 2
+        doProgress "- Generating uninstApps.md" 2
         mdfile="${DOCDIR}/uninstApps.md"
         apptype="Uninstalled Apps"
         applist=(${uninstApps[*]})

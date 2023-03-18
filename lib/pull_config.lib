@@ -108,14 +108,14 @@ getXPrivacy() {
   doProgress "Looking for XPrivacy data"
 
   [[ $MK_XPRIVACY_EXPORT -gt 0 ]] && {
-    doProgress "- triggering XPrivacy export" 2
+    doProgress "- Triggering XPrivacy export" 2
     local filename="/sdcard/xprivacy_$(date +"%Y%m%d_%H%M%S").xml"
     local msg="$((adb ${ADBOPTS} shell "am start -a biz.bokhorst.xprivacy.action.EXPORT -e FileName ${filename}") 2>&1)"
     local -i sleepcount=0
     local -i oldsize=0
     local -i newsize=0
     local newsizestr nobreak=0
-    doProgress "- waiting for XPrivacy export to complete" 2
+    doProgress "- Waiting for XPrivacy export to complete" 2
     while [[ $sleepcount -lt 10 ]] # 20s should be sufficient, else something went wrong
     do
       sleep 2 # give it some time to complete
@@ -124,15 +124,15 @@ getXPrivacy() {
         newsize=(${newsizestr//[$'\r']})
         if [[ $newsize -eq 0 ]]; then
           sleepcount+=1
-          doProgress "  + export started, file still empty\r" 3 n
+          doProgress "  + Export started, file still empty\r" 3 n
           nobreak=1
         elif [[ $newsize -eq $oldsize ]]; then  # not growing anymore
-          doProgress "  + export seems complete, final size: ${newsize} bytes" 3
+          doProgress "  + Export seems complete, final size: ${newsize} bytes" 3
           nobreak=0
           break
         else
           oldsize=$newsize
-          doProgress "  + export running, current size: ${newsize} bytes\r" 3 n
+          doProgress "  + Export running, current size: ${newsize} bytes\r" 3 n
           nobreak=1
         fi
       else
@@ -154,7 +154,7 @@ getXPrivacy() {
 
   [[ $MK_XPRIVACY_PULL -gt 0 ]] && {
     [[ -n "$(adb ${ADBOPTS} shell 'su -c "ls /data/system/xprivacy 2>/dev/null"')" ]] && {
-      doProgress "- pulling XPrivacy databases" 2
+      doProgress "- Pulling XPrivacy databases" 2
       mkdir "${CONFDIR}/xprivacy_dbs"
       if [[ ${ROOT_COMPAT} -eq 1 ]]; then
         local tmpdir="/sdcard/xprivacy_$(date +"%Y%m%d_%H%M%S")"

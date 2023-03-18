@@ -24,7 +24,7 @@ trim() {
 
 #
 # -------------------------------------------=[ Log progress (if enabled) ]=--
-# Call: doProgress "what to show" [level [eparm]]"
+# Call: doProgress "What to show" [level [eparm]]"
 # level defaults to 1; eparm has optional additional params to echo
 # depends on global PROGRESS var (level, 0..n; 0=be quiet)
 #
