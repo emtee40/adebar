@@ -92,3 +92,5 @@ if [[ $GETAPK -gt 0 ]]; then
 fi
 adb $ADBOPTS shell -e none -n -T "su -c 'tar cf - data/user/0/${pkg}'" >"${BACKUPDIR}/user-${pkg}.tar"
 adb $ADBOPTS shell -e none -n -T "su -c 'tar cf - data/user_de/0/${pkg}'" >"${BACKUPDIR}/user_de-${pkg}.tar"
+adb $ADBOPTS shell -e none -n -T "su -c '[ -d data/media/0/Android/data/${pkg} ]'" &&
+    adb $ADBOPTS shell -e none -n -T "su -c 'tar cf - data/media/0/Android/data/${pkg}'" >"${BACKUPDIR}/extdata-${pkg}.tar"

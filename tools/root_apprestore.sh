@@ -92,6 +92,7 @@ rc=$?
 # --=[ do the restore ]=--
 USER_TAR="${BACKUPDIR}/user-${pkg}.tar"
 USER_DE_TAR="${BACKUPDIR}/user_de-${pkg}.tar"
+EXTDATA_TAR="${BACKUPDIR}/extdata-${pkg}.tar"
 
 set -ex
 
@@ -128,16 +129,20 @@ adb $ADBOPTS shell "su -c 'pm clear $pkg'"
 # Restore data files
 cat "$USER_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
 cat "$USER_DE_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
+[[ -f "$EXTDATA_TAR" ]] && cat "$EXTDATA_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
 
 # Remove cache contents
 adb $ADBOPTS shell "su -c 'rm -rf /data/user{,_de}/0/${pkg}/{cache,code_cache}'"
 
-# Adapt to new UID
+# Adapt to new ownership
 adb $ADBOPTS shell "su -c 'chown -R $PKGUID:$PKGUID /data/user/0/${pkg} /data/user_de/0/${pkg}'"
+[[ -f "$EXTDATA_TAR" ]] &&
+    adb $ADBOPTS shell "su -c 'chgrp -R $((PKGUID+20000)) /data/media/0/Android/data/${pkg}'"
 
 # Restore SELinux contexts
 adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user/0/${pkg}'"
 adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user_de/0/${pkg}'"
+adb $ADBOPTS shell "su -c 'restorecon -F -R /data/media/0/Android/data/${pkg}'"
 
 # Reenable package
 adb $ADBOPTS shell "su -c 'pm enable $pkg'"
