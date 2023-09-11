@@ -142,7 +142,8 @@ adb $ADBOPTS shell "su -c 'chown -R $PKGUID:$PKGUID /data/user/0/${pkg} /data/us
 # Restore SELinux contexts
 adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user/0/${pkg}'"
 adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user_de/0/${pkg}'"
-adb $ADBOPTS shell "su -c 'restorecon -F -R /data/media/0/Android/data/${pkg}'"
+[[ -f "$EXTDATA_TAR" ]] &&
+    adb $ADBOPTS shell "su -c 'restorecon -F -R /data/media/0/Android/data/${pkg}'"
 
 # Reenable package
 adb $ADBOPTS shell "su -c 'pm enable $pkg'"
