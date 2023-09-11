@@ -14,15 +14,17 @@ ERROR_FILE_NOT_FOUND=5
 ERROR_NO_APK=99
 ERROR_NOT_INSTALLED=101
 
-opts='ns:h'
+opts='nes:h'
 
 ADBOPTS=
 HELP=0
 SETAPK=1
+SETEXT=0
 while getopts $opts arg; do
   case $arg in
     :) echo "$0 requires an argument:"; exit $ERROR_SYNTAX ;;
     n) SETAPK=0 ;;
+    e) SETEXT=1 ;;
     s) if [[ -n "$(adb devices | grep $OPTARG)" ]]; then
          ADBOPTS="-s $OPTARG"
        else
@@ -41,9 +43,10 @@ shift $((OPTIND-1))
   echo
   echo "Syntax:"
   echo "  $0 -h"
-  echo -e "  $0 [-s <serial>] [-n] <packageName> [sourceDirectory]\n"
+  echo -e "  $0 [-s <serial>] [-e] [-n] <packageName> [sourceDirectory]\n"
   echo "Parameters:"
   echo "  -h         : show this help"
+  echo "  -e         : restore external storage data (located under Android/data/)"
   echo "  -n         : noAPK (backup data only)"
   echo -e "  -s <serial>: serial of the device (needed if multiple devices are connected)\n"
   echo "Examples:"
@@ -126,23 +129,28 @@ adb $ADBOPTS shell "su -c 'pm disable $pkg'"
 adb $ADBOPTS shell "su -c 'am force-stop $pkg'"
 adb $ADBOPTS shell "su -c 'pm clear $pkg'"
 
+# Determine whether restoring external data is necessary
+[[ $SETEXT -gt 0 ]] && [[ -f "${EXTDATA_TAR}" ]] ||
+    SETEXT=0
+
 # Restore data files
 cat "$USER_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
 cat "$USER_DE_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
-[[ -f "$EXTDATA_TAR" ]] && cat "$EXTDATA_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
+[[ $SETEXT -gt 0 ]] &&
+    cat "$EXTDATA_TAR" | adb $ADBOPTS shell -e none -T "su -c 'tar xf -'"
 
 # Remove cache contents
 adb $ADBOPTS shell "su -c 'rm -rf /data/user{,_de}/0/${pkg}/{cache,code_cache}'"
 
 # Adapt to new ownership
 adb $ADBOPTS shell "su -c 'chown -R $PKGUID:$PKGUID /data/user/0/${pkg} /data/user_de/0/${pkg}'"
-[[ -f "$EXTDATA_TAR" ]] &&
+[[ $SETEXT -gt 0 ]] &&
     adb $ADBOPTS shell "su -c 'chgrp -R $((PKGUID+20000)) /data/media/0/Android/data/${pkg}'"
 
 # Restore SELinux contexts
 adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user/0/${pkg}'"
 adb $ADBOPTS shell "su -c 'restorecon -F -R /data/user_de/0/${pkg}'"
-[[ -f "$EXTDATA_TAR" ]] &&
+[[ $SETEXT -gt 0 ]] &&
     adb $ADBOPTS shell "su -c 'restorecon -F -R /data/media/0/Android/data/${pkg}'"
 
 # Reenable package

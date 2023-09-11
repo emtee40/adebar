@@ -7,16 +7,18 @@ ERROR_NO_ROOT=3
 ERROR_FILE_NOT_FOUND=5
 ERROR_NOT_INSTALLED=101
 
-opts='ns:h'
+opts='nes:h'
 
 ADBOPTS=
 ANDROIDSERIAL=
 HELP=0
 GETAPK=1
+GETEXT=0
 while getopts $opts arg; do
   case $arg in
     :) echo "$0 requires an argument:"; exit $ERROR_SYNTAX ;;
     n) GETAPK=0 ;;
+    e) GETEXT=1 ;;
     s) if [[ -n "$(adb devices | grep $OPTARG)" ]]; then
          ADBOPTS="-s $OPTARG"
          ANDROID_SERIAL="$OPTARG"
@@ -36,9 +38,10 @@ shift $((OPTIND-1))
   echo
   echo "Syntax:"
   echo "  $0 -h"
-  echo -e "  $0 [-s <serial>] [-n] <packageName> [targetDirectory]\n"
+  echo -e "  $0 [-s <serial>] [-e] [-n] <packageName> [targetDirectory]\n"
   echo "Parameters:"
   echo "  -h         : show this help"
+  echo "  -e         : backup external storage data (located under Android/data/)"
   echo "  -n         : noAPK (backup data only)"
   echo -e "  -s <serial>: serial of the device (needed if multiple devices are connected)\n"
   echo "Examples:"
@@ -76,6 +79,11 @@ if [[ -z "$(adb $ADBOPTS shell pm list packages|grep package:${pkg})" ]]; then
   exit $ERROR_NOT_INSTALLED
 fi
 
+# --=[ Determine whether backing up external data is necessary ]=--
+[[ $GETEXT -gt 0 ]] && 
+    adb $ADBOPTS shell -e none -n -T "su -c '[ -d data/media/0/Android/data/${pkg} ]'" ||
+        GETEXT=0
+
 # --=[ Performing the backup ]=--
 echo "Backing up '$pkg' to directory: $BACKUPDIR"
 if [[ $GETAPK -gt 0 ]]; then
@@ -92,5 +100,5 @@ if [[ $GETAPK -gt 0 ]]; then
 fi
 adb $ADBOPTS shell -e none -n -T "su -c 'tar cf - data/user/0/${pkg}'" >"${BACKUPDIR}/user-${pkg}.tar"
 adb $ADBOPTS shell -e none -n -T "su -c 'tar cf - data/user_de/0/${pkg}'" >"${BACKUPDIR}/user_de-${pkg}.tar"
-adb $ADBOPTS shell -e none -n -T "su -c '[ -d data/media/0/Android/data/${pkg} ]'" &&
+[[ $GETEXT -gt 0 ]] &&
     adb $ADBOPTS shell -e none -n -T "su -c 'tar cf - data/media/0/Android/data/${pkg}'" >"${BACKUPDIR}/extdata-${pkg}.tar"
