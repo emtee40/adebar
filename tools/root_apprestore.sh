@@ -116,7 +116,7 @@ fi
 PKGUID=$(adb $ADBOPTS shell "su -c 'cat /data/system/packages.list'" | grep "${pkg} " | cut -d' ' -f2)
 [[ -z $PKGUID ]] && PKGUID=$(adb $ADBOPTS shell "dumpsys package ${pkg}" | grep "userId" | head -n1 | cut -d'=' -f2)
 [[ $(echo "$PKGUID" | grep -E '^[0-9]+$') ]] || {   # UID must be numeric and not NULL
-  if [[ -z "(adb $ADBOPTS shell pm list packages|grep package:${pkg})" ]]; then
+  if [[ -z "$(adb $ADBOPTS shell pm list packages|grep package:${pkg})" ]]; then
     echo "Cannot find PKGUID; package '${pkg}' is not installed. Exiting."
   else
     echo "Cannot find PKGUID, exiting."
