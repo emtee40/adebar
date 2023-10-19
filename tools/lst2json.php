@@ -66,7 +66,10 @@ preg_match_all("/^Row: \d+ ${regnames}\$/ims", $smslist, $matches);
 $smsarr = [];
 for ($i=0; $i<count($matches[0]);++$i) {
   $item = new stdClass();
-  foreach ($fields as $field) $item->{$field} = $matches[$field][$i];
+  foreach ($fields as $field) {
+    $item->{$field} = $matches[$field][$i];
+    if ( $field == 'date' ) $item->date_formatted = date('Y-m-d H:i:s',$matches[$field][$i]/1000);
+  }
   $smsarr[] = $item;
 }
 
