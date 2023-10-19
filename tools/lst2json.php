@@ -69,6 +69,16 @@ for ($i=0; $i<count($matches[0]);++$i) {
   foreach ($fields as $field) {
     $item->{$field} = $matches[$field][$i];
     if ( $field == 'date' ) $item->date_formatted = date('Y-m-d H:i:s',$matches[$field][$i]/1000);
+    elseif ( $type = 'calls' && $field = 'type' ) switch ($matches[$field][$i]) {
+      case 1: $item->type_name = 'incoming'; break;
+      case 2: $item->type_name = 'outgoing'; break;
+      case 3: $item->type_name = 'missed'; break;
+      case 4: $item->type_name = 'voicemail'; break;
+      case 5: $item->type_name = 'rejected'; break;
+      case 6: $item->type_name = 'blocked'; break;
+      case 7: $item->type_name = 'answered_externally'; break; // i.e. by another device using the same number
+      default: echo "encountered unknown call type '".$matches[$field][$i]."'\n"; $item->type_name = 'unknown_call_type'; break;
+    }
   }
   $smsarr[] = $item;
 }
