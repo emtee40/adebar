@@ -80,7 +80,7 @@ errm… I mean, Credits and thanks:
 
 * Adebar Logo design by [Mathis Brüchert](https://social.anoxinon.de/@m4TZ) and Acrylic by [Mondstern](https://codeberg.org/mondstern)
 * Code submitted by [many contributors](https://github.com/IzzySoft/Adebar/graphs/contributors)
-* suggestions, problems pointed out, ideas given by even more great people via [issues](https://codeberg.org/izzy/Adebar/issues), by mail, at [Mastodon](https://mastodon.technology/@IzzyOnDroid)…
+* suggestions, problems pointed out, ideas given by even more great people via [issues](https://codeberg.org/izzy/Adebar/issues), by mail, at [Mastodon](https://floss.social/@IzzyOnDroid)…
 
 [<img src='https://pixelfed.social/storage/m/_v2/13678/83a90637a-595111/ay84jSsXAhjQ/UukzNM5gRsshoVCa1kNtGSmfWdFFfvBc1W3bGibH.jpg' width='30'>][6] (Adebar Logo in [Mondstern's Gallery][7] of [Codeberg projects][8])
 
